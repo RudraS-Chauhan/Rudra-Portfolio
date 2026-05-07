@@ -2,6 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  SiJavascript, SiTypescript, SiPython, SiCplusplus, SiReact, 
+  SiNextdotjs, SiNodedotjs, SiTailwindcss, SiFlutter, SiFirebase, 
+  SiDocker, SiGit, SiVercel, SiGooglegemini, SiDart, SiGithub 
+} from 'react-icons/si';
+import { FaJava, FaDatabase, FaRobot, FaMicrochip, FaCogs, FaProjectDiagram } from 'react-icons/fa';
 
 const countUpCurve = (progress: number) => 1 - Math.pow(1 - progress, 3);
 
@@ -33,6 +39,36 @@ const techDescriptions: Record<string, string> = {
   'SolidWorks': '3D CAD design for hardware.',
   'Hardware Integration': 'Bridging software & physical systems.',
   'Rapid Prototyping': 'Iterative physical development.',
+};
+
+const techIcons: Record<string, React.ReactNode> = {
+  'JavaScript': <SiJavascript className="w-4 h-4" />,
+  'TypeScript': <SiTypescript className="w-4 h-4" />,
+  'Python': <SiPython className="w-4 h-4" />,
+  'Java': <FaJava className="w-4 h-4" />,
+  'C++': <SiCplusplus className="w-4 h-4" />,
+  'SQL': <FaDatabase className="w-4 h-4" />,
+  'React': <SiReact className="w-4 h-4" />,
+  'Next.js': <SiNextdotjs className="w-4 h-4" />,
+  'Node.js': <SiNodedotjs className="w-4 h-4" />,
+  'Tailwind': <SiTailwindcss className="w-4 h-4" />,
+  'Tailwind CSS': <SiTailwindcss className="w-4 h-4" />,
+  'Flutter': <SiFlutter className="w-4 h-4" />,
+  'Dart (Flutter)': <SiDart className="w-4 h-4" />,
+  'Firebase': <SiFirebase className="w-4 h-4" />,
+  'Docker': <SiDocker className="w-4 h-4" />,
+  'Git': <SiGit className="w-4 h-4" />,
+  'Git & GitHub': <SiGithub className="w-4 h-4" />,
+  'Vercel': <SiVercel className="w-4 h-4" />,
+  'REST APIs': <FaProjectDiagram className="w-4 h-4" />,
+  'SQL databases': <FaDatabase className="w-4 h-4" />,
+  'Gemini AI': <SiGooglegemini className="w-4 h-4" />,
+  'Google Gemini': <SiGooglegemini className="w-4 h-4" />,
+  'Claude AI': <FaRobot className="w-4 h-4" />,
+  'Prompt Engineering': <FaRobot className="w-4 h-4" />,
+  'SolidWorks': <FaCogs className="w-4 h-4" />,
+  'Hardware Integration': <FaMicrochip className="w-4 h-4" />,
+  'Rapid Prototyping': <FaCogs className="w-4 h-4" />,
 };
 
 const TooltipTag = ({ text, children, className }: { text?: string, children: React.ReactNode, className?: string }) => {
@@ -608,30 +644,31 @@ export default function Portfolio() {
 
       {/* Navbar */}
       <div className="fixed top-0 left-0 h-[2px] bg-gradient-to-r from-[#22c55e] to-[#a3e635] z-[9999]" style={{ width: `${scrollProgress * 100}%` }} />
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navScrolled ? 'bg-[#080808]/90 backdrop-blur-[20px] border-b border-[#22c55e]/15' : 'bg-transparent border-transparent'}`}>
-        <div className="max-w-6xl mx-auto px-6 md:px-10 h-20 flex items-center justify-between">
-          <a href="#hero" className="font-mono font-bold text-[20px] text-[#22c55e] hover:text-white hover:tracking-[2px] hover:shadow-[0_0_15px_rgba(34,197,94,0.5)] transition-all duration-300 relative group">
-            RSC
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#22c55e] group-hover:w-full transition-all duration-300"></span>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${navScrolled ? 'bg-[#080808]/80 backdrop-blur-[20px] border-b border-[#22c55e]/10' : 'bg-transparent border-transparent'}`}>
+        <div className="max-w-6xl mx-auto px-6 md:px-10 h-20 flex items-center justify-between relative">
+          <a href="#hero" className="font-mono font-black text-[24px] tracking-tighter flex items-center gap-1 group relative z-10 w-[80px]">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#22c55e] to-emerald-200 group-hover:to-white transition-all duration-500">RSC</span>
+            <span className="w-2 h-2 rounded-full bg-[#22c55e] animate-pulse group-hover:scale-150 transition-transform duration-300"></span>
           </a>
-          <div className="hidden md:flex items-center gap-6">
-            <div className="flex items-center gap-4 text-sm text-white/45">
+          
+          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center px-8 py-3 rounded-full bg-[#111]/80 backdrop-blur-md border border-white/10 shadow-[0_0_20px_rgba(0,0,0,0.5)] z-0">
+            <div className="flex items-center gap-6 text-[13px] font-medium text-white/50 tracking-widest uppercase">
               <a href="#work" className="hover:text-white transition-colors duration-200">Work</a>
-              <span className="opacity-30">·</span>
               <a href="#journey" className="hover:text-white transition-colors duration-200">Journey</a>
-              <span className="opacity-30">·</span>
               <a href="#about" className="hover:text-white transition-colors duration-200">About</a>
-              <span className="opacity-30">·</span>
               <a href="#skills" className="hover:text-white transition-colors duration-200">Skills</a>
-              <span className="opacity-30">·</span>
               <a href="#contact" className="hover:text-white transition-colors duration-200">Contact</a>
             </div>
-            <MagneticButton href="#contact" className="px-5 py-2 rounded-full border border-[#22c55e] text-[#22c55e] text-sm font-medium hover:bg-[#22c55e]/10 transition-colors cursor-pointer">
+          </div>
+          
+          <div className="hidden md:flex items-center justify-end w-[80px] z-10">
+            <MagneticButton href="#contact" className="px-5 py-2.5 rounded-full bg-[#22c55e]/10 border border-[#22c55e]/30 text-[#22c55e] text-sm font-medium hover:bg-[#22c55e] hover:text-black transition-all duration-300 cursor-pointer w-max whitespace-nowrap shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]">
               Let's Talk
             </MagneticButton>
           </div>
-          <button className="md:hidden text-[#22c55e] p-2" onClick={() => setMenuOpen(true)} aria-label="Open Menu">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          
+          <button className="md:hidden text-[#22c55e] p-2 -mr-2 z-10" onClick={() => setMenuOpen(true)} aria-label="Open Menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-8 h-8"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
         </div>
       </nav>
@@ -660,8 +697,14 @@ export default function Portfolio() {
             <div className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-[pulse_2s_ease-in-out_infinite]" />
             Systems & Machine Learning
           </div>
-          <h1 className="text-[clamp(48px,8vw,96px)] font-black leading-[1.1] mb-2 tracking-tight">
-            <ScrambleText text="Rudra Singh Chauhan" />
+          <h1 className="text-[clamp(48px,8vw,96px)] font-black leading-[1.1] mb-2 tracking-tight group">
+            <span className="text-white/40 block text-[clamp(24px,4vw,48px)] mb-2 font-mono font-medium tracking-tight">
+              <ScrambleText text="Hello, world. I'm" />
+            </span>
+            <div className="flex items-center gap-4">
+              <span className="text-white hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-[#22c55e] hover:to-emerald-200 transition-all duration-300">Rudra</span>
+              <span className="text-[#22c55e] animate-[bounce_2s_infinite] origin-bottom inline-block">👋</span>
+            </div>
             <span className="gradient-text block mt-2 text-[clamp(24px,4vw,48px)]">Engineering Tomorrow's Innovations</span>
           </h1>
           <div className="text-xl md:text-2xl text-white/50 mb-8 mt-2 h-8">
@@ -908,8 +951,11 @@ export default function Portfolio() {
           <div className="absolute top-0 bottom-0 left-[-0.5px] w-px bg-gradient-to-b from-[#22c55e] via-transparent to-transparent opacity-50"></div>
           
           <motion.div className="relative group" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.5 }}>
-            <div className="absolute -left-[41px] md:-left-[57px] top-1 w-4 h-4 rounded-full bg-[#111] border-2 border-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.5)] z-10 flex items-center justify-center animate-[pulse_2s_ease-in-out_infinite]">
-               <div className="w-1.5 h-1.5 bg-[#22c55e] rounded-full"></div>
+            <div className="absolute -left-[41px] md:-left-[57px] top-1 z-10 flex items-center justify-center">
+              <div className="absolute w-4 h-4 rounded-full bg-[#22c55e] animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite] opacity-40"></div>
+              <div className="relative w-4 h-4 rounded-full bg-[#111] border-2 border-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.5)] flex items-center justify-center">
+                 <div className="w-1.5 h-1.5 bg-[#22c55e] rounded-full"></div>
+              </div>
             </div>
             <div className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 hover:border-[#22c55e]/30 transition-all duration-300 shadow-2xl group-hover:shadow-[0_0_30px_rgba(34,197,94,0.15)] relative">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
@@ -939,7 +985,10 @@ export default function Portfolio() {
           </motion.div>
           
           <motion.div className="relative group" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.5, delay: 0.1 }}>
-            <div className="absolute -left-[41px] md:-left-[57px] top-1 w-4 h-4 rounded-full bg-[#111] border border-white/20 shadow-[0_0_10px_rgba(255,255,255,0.2)] animate-[pulse_2.5s_ease-in-out_infinite] z-10"></div>
+            <div className="absolute -left-[41px] md:-left-[57px] top-1 z-10 flex items-center justify-center">
+              <div className="absolute w-4 h-4 rounded-full border border-white/40 animate-[ping_4s_cubic-bezier(0,0,0.2,1)_infinite] opacity-50"></div>
+              <div className="relative w-4 h-4 rounded-full bg-[#111] border border-white/20 shadow-[0_0_10px_rgba(255,255,255,0.2)]"></div>
+            </div>
             <div className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 hover:border-blue-500/30 transition-all duration-300 shadow-2xl group-hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] relative">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                 <div className="flex items-center gap-3">
@@ -1002,7 +1051,7 @@ export default function Portfolio() {
           <div className="w-full md:w-[60%] flex flex-col">
             <span className="hidden md:block text-[100px] leading-[0.8] text-[#22c55e] font-serif opacity-60 -mb-4">"</span>
             <p className="text-[15px] sm:text-[16px] md:text-[18px] leading-[1.8] text-white/75 font-normal">
-              <TypewriterQuote quote="I am a driven first-year BTech student specializing in AI & Machine Learning, believing that true learning happens through building. Refusing to wait for graduation, I have already engineered and launched a live AI placement kit platform serving hundreds of students, architected complex bionic hardware prototypes like the FOREFLEX-AMTU, and even built a profitable 3D origami venture. I don't just build demos; I architect robust, real-world solutions. By leveraging early adoption of advanced frameworks and deep foundational computer science knowledge, I use AI not as a crutch, but as an exponential force multiplier." />
+              <TypewriterQuote quote="I'm a builder. I don't wait for graduation to start creating. From launching a live AI platform serving hundreds of students to architecting bionic hardware like the FOREFLEX-AMTU, I turn complex problems into scalable solutions. I use AI not as a crutch, but as an exponential force multiplier to engineer the future—today." />
             </p>
             <div className="flex flex-wrap gap-3 md:gap-4 mt-8">
               <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="flex-1 md:flex-none text-center text-xs md:text-sm font-semibold text-[#22c55e] hover:text-black border border-[#22c55e]/30 px-6 md:px-8 py-3 md:py-3.5 rounded-xl hover:bg-[#22c55e] transition-all">
@@ -1087,6 +1136,7 @@ export default function Portfolio() {
                 {['JavaScript', 'TypeScript', 'Python', 'Java', 'C++', 'SQL', 'React', 'Next.js', 'Node.js', 'Tailwind', 'Flutter', 'Firebase', 'Docker', 'Git', 'Vercel', 'Gemini AI', 'SolidWorks'].map((tech) => (
                   <TooltipTag key={`${i}-${tech}`} text={techDescriptions[tech]}>
                     <div className="flex items-center gap-2 px-5 py-3 bg-[#161616] border border-white/10 rounded-full text-white/80 whitespace-nowrap text-sm font-medium hover:bg-[#22c55e]/10 hover:text-[#22c55e] hover:border-[#22c55e]/50 cursor-pointer transition-colors shadow-lg">
+                      <span className="text-[#22c55e] opacity-80">{techIcons[tech]}</span>
                       {tech}
                     </div>
                   </TooltipTag>
@@ -1107,7 +1157,8 @@ export default function Portfolio() {
               {['Java', 'Python', 'SQL', 'JavaScript', 'Dart (Flutter)', 'C++'].map((skill, i) => (
                 <motion.div key={skill} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="cursor-default">
                   <TooltipTag text={techDescriptions[skill]}>
-                    <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm font-medium text-white/80 hover:bg-[#22c55e]/10 hover:border-[#22c55e]/50 hover:text-[#22c55e] hover:-translate-y-1 hover:shadow-lg shadow-[#22c55e]/10 transition-all flex">
+                    <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm font-medium text-white/80 hover:bg-[#22c55e]/10 hover:border-[#22c55e]/50 hover:text-[#22c55e] hover:-translate-y-1 hover:shadow-lg shadow-[#22c55e]/10 transition-all flex items-center gap-2">
+                       <span className="text-[#22c55e] opacity-80">{techIcons[skill]}</span>
                       {skill}
                     </span>
                   </TooltipTag>
@@ -1125,7 +1176,8 @@ export default function Portfolio() {
               {['React', 'Next.js', 'Flutter', 'Tailwind CSS', 'Git & GitHub', 'Vercel', 'REST APIs', 'SQL databases'].map((skill, i) => (
                 <motion.div key={skill} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="cursor-default">
                   <TooltipTag text={techDescriptions[skill]}>
-                    <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm font-medium text-white/80 hover:bg-[#22c55e]/10 hover:border-[#22c55e]/50 hover:text-[#22c55e] hover:-translate-y-1 hover:shadow-lg shadow-[#22c55e]/10 transition-all flex">
+                    <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm font-medium text-white/80 hover:bg-[#22c55e]/10 hover:border-[#22c55e]/50 hover:text-[#22c55e] hover:-translate-y-1 hover:shadow-lg shadow-[#22c55e]/10 transition-all flex items-center gap-2">
+                       <span className="text-[#22c55e] opacity-80">{techIcons[skill]}</span>
                       {skill}
                     </span>
                   </TooltipTag>
@@ -1143,7 +1195,8 @@ export default function Portfolio() {
               {['Prompt Engineering', 'Google Gemini', 'Claude AI', 'Hardware Integration', 'SolidWorks', 'Rapid Prototyping'].map((skill, i) => (
                 <motion.div key={skill} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="cursor-default">
                   <TooltipTag text={techDescriptions[skill]}>
-                    <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm font-medium text-white/80 hover:bg-[#22c55e]/10 hover:border-[#22c55e]/50 hover:text-[#22c55e] hover:-translate-y-1 hover:shadow-lg shadow-[#22c55e]/10 transition-all flex">
+                    <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm font-medium text-white/80 hover:bg-[#22c55e]/10 hover:border-[#22c55e]/50 hover:text-[#22c55e] hover:-translate-y-1 hover:shadow-lg shadow-[#22c55e]/10 transition-all flex items-center gap-2">
+                       <span className="text-[#22c55e] opacity-80">{techIcons[skill]}</span>
                       {skill}
                     </span>
                   </TooltipTag>
