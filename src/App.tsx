@@ -909,7 +909,7 @@ export default function Portfolio() {
       <motion.section id="work" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }} className="py-24 md:py-32 max-w-6xl mx-auto px-6 md:px-10">
         <div className="flex items-end justify-between mb-6">
           <div>
-            <div className="text-[10px] tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">Featured</div>
+            <div className="text-sm md:text-base tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">Featured</div>
             <h3 className="text-3xl font-black text-white mt-2">
               Latest Projects
             </h3>
@@ -1094,7 +1094,7 @@ export default function Portfolio() {
 
       {/* Journey */}
       <motion.section id="journey" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }} className="py-24 md:py-32 max-w-6xl mx-auto px-6 md:px-10">
-        <div className="text-[10px] tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">MILESTONES</div>
+        <div className="text-sm md:text-base tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">MILESTONES</div>
         <h2 className="text-[clamp(32px,5vw,52px)] font-black text-white mt-2 mb-12">
           Professional Journey
         </h2>
@@ -1173,7 +1173,7 @@ export default function Portfolio() {
 
       {/* About */}
       <motion.section id="about" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }} className="py-24 md:py-32 max-w-6xl mx-auto px-6 md:px-10">
-        <div className="text-[10px] tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">WHO I AM</div>
+        <div className="text-sm md:text-base tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">WHO I AM</div>
         <h2 className="text-[clamp(32px,5vw,52px)] font-black text-white mt-2">
           About
         </h2>
@@ -1217,7 +1217,7 @@ export default function Portfolio() {
 
       {/* Education */}
       <motion.section id="education" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }} className="py-12 md:py-16 max-w-6xl mx-auto px-6 md:px-10">
-        <div className="text-[10px] tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">ACADEMICS</div>
+        <div className="text-sm md:text-base tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">ACADEMICS</div>
         <h2 className="text-[clamp(32px,5vw,52px)] font-black text-white mt-2">
           Education
         </h2>
@@ -1378,7 +1378,7 @@ export default function Portfolio() {
       <motion.section id="insights" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }} className="py-24 md:py-32 max-w-6xl mx-auto px-6 md:px-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <div className="text-[10px] tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">WRITING & THOUGHTS</div>
+            <div className="text-sm md:text-base tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">WRITING & THOUGHTS</div>
             <h2 className="text-[clamp(32px,5vw,52px)] font-black text-white mt-2">
               Insights
             </h2>
@@ -1424,7 +1424,7 @@ export default function Portfolio() {
 
       {/* Contact */}
       <motion.section id="contact" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }} className="py-20 md:py-32 max-w-6xl mx-auto px-4 md:px-10 overflow-hidden">
-        <div className="text-[10px] tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">GET IN TOUCH</div>
+        <div className="text-sm md:text-base tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">GET IN TOUCH</div>
         <h2 className="text-[clamp(32px,5vw,52px)] font-black text-white mt-2">
           Contact
         </h2>
