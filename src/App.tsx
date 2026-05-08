@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   SiJavascript, SiTypescript, SiPython, SiCplusplus, SiReact, 
@@ -8,6 +8,9 @@ import {
   SiDocker, SiGit, SiVercel, SiGooglegemini, SiDart, SiGithub 
 } from 'react-icons/si';
 import { FaJava, FaDatabase, FaRobot, FaMicrochip, FaCogs, FaProjectDiagram } from 'react-icons/fa';
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const countUpCurve = (progress: number) => 1 - Math.pow(1 - progress, 3);
 
@@ -329,7 +332,7 @@ const Cursor = () => {
   const [isTouch, setIsTouch] = useState(true);
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
-  const requestRef = useRef<number>();
+  const requestRef = useRef<number>(0);
   const mouse = useRef({ x: 0, y: 0 });
   const ring = useRef({ x: 0, y: 0 });
 
@@ -349,8 +352,8 @@ const Cursor = () => {
     };
 
     const render = () => {
-      ring.current.x += (mouse.current.x - ring.current.x) * 0.08;
-      ring.current.y += (mouse.current.y - ring.current.y) * 0.08;
+      ring.current.x += (mouse.current.x - ring.current.x) * 0.25;
+      ring.current.y += (mouse.current.y - ring.current.y) * 0.25;
       if (ringRef.current) {
         ringRef.current.style.transform = `translate3d(calc(${ring.current.x}px - 50%), calc(${ring.current.y}px - 50%), 0)`;
       }
@@ -407,48 +410,102 @@ const Cursor = () => {
 const ChatWidget = () => {
   const [mood, setMood] = useState('technical');
   const [inputValue, setInputValue] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState<{role: 'system' | 'user', text: string}[]>([
-    { role: 'system', text: "Hello! I'm here to help you learn about Rudra's qualifications, experience, and skills. How may I assist you?" }
+    { role: 'system', text: "Hello! I'm Rudra's AI assistant. I can answer questions about his skills, projects, and availability. What would you like to know?" }
   ]);
 
-  const handleSend = (text: string) => {
-    if(!text.trim()) return;
-    setMessages(prev => [...prev, { role: 'user', text }]);
-    setInputValue('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping]);
+
+  const handleSend = async (text: string) => {
+    if (!text.trim() || isTyping) return;
     
-    setTimeout(() => {
-      let reply = "I'm a static demo right now, but I can tell you Rudra is an excellent engineer!";
-      if (mood === 'visionary') reply = "Rudra sees beyond constraints, orchestrating code that redefines the possible.";
-      if (mood === 'summarized') reply = "Rudra: BTech CS, AI & Full-Stack focus. Fast learner, strong shipper.";
-      if (mood === 'casual') reply = "Rudra's super cool, ships fast and builds awesome tech stuff. What else you wanna know?";
+    const userMessage = text.trim();
+    setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+    setInputValue('');
+    setIsTyping(true);
+
+    try {
+      const systemInstruction = `
+        You are a friendly and professional AI assistant for Rudra Singh Chauhan's portfolio.
+        Rudra is a first-year BTech student specializing in AI & Machine Learning at Galgotias University.
+        
+        Persona: ${mood === 'technical' ? 'Highly technical, precise, focusing on code and architecture.' : 
+                  mood === 'visionary' ? 'Inspiring, focusing on the future of AI and innovation.' : 
+                  mood === 'summarized' ? 'Extremely concise, bullet points, getting straight to the facts.' : 
+                  'Casual, friendly, approachable, like a helpful peer.'}
+
+        Key information about Rudra:
+        - Role: Lead Engineer @ ECHO-GATE Robotics, AI & Full-Stack Developer.
+        - Core Projects:
+          1. AtlasCV: AI Placement Kit Generator (Next.js, Gemini API, Tailwind). Helps students get ATS resumes and LinkedIn profiles in 60s.
+          2. ECHO-GATE: Leading architectural development for centralized robotics and automated operations core.
+          3. FOREFLEX-AMTU: Bionic ankle actuator research (Hardware/CAD/SolidWorks).
+          4. Fold_Fantasia: Previous 3D origami venture (2.5x growth).
+        - Skills: JavaScript, TypeScript, Python, Java, C++, SQL, React, Next.js, Node.js, Tailwind CSS, Flutter, Dart, Firebase, Docker, Git.
+        - Availability: Open to internships, projects, and collaborations.
+        - Contact: rudra.dev.builds@gmail.com, WhatsApp: +91 7084150015.
+        
+        Guidelines:
+        - Keep responses concise and helpful.
+        - If you don't know something, be honest but mention Rudra's broad learning capacity.
+        - Encourage the user to contact Rudra for specific inquiries.
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: [
+          ...messages.map(m => ({ role: m.role === 'system' ? 'model' : 'user', parts: [{ text: m.text }] })),
+          { role: 'user', parts: [{ text: userMessage }] }
+        ],
+        config: {
+          systemInstruction,
+          temperature: 0.7,
+        },
+      });
+
+      const reply = response.text || "I'm having a little trouble connecting right now, but feel free to reach out to Rudra directly!";
       setMessages(prev => [...prev, { role: 'system', text: reply }]);
-    }, 600);
+    } catch (error) {
+      console.error("Chat Error:", error);
+      setMessages(prev => [...prev, { role: 'system', text: "I encountered an error. Please try again later or contact Rudra directly." }]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   return (
-    <div className="mt-8 md:mt-12 bg-[#111] border border-white/5 rounded-3xl p-4 md:p-6 relative flex flex-col w-full shadow-2xl h-[400px] max-w-full overflow-hidden">
-      <div className="flex items-center justify-between mb-4 md:mb-6 shrink-0">
-         <div className="flex items-center gap-2 md:gap-3">
+    <div className="mt-8 md:mt-12 bg-[#111] border border-white/5 rounded-3xl p-4 md:p-6 relative flex flex-col w-full shadow-2xl h-[450px] max-w-full overflow-hidden">
+      <div className="flex items-center justify-between mb-4 md:mb-6 shrink-0 gap-4">
+         <div className="flex items-center gap-2 md:gap-3 overflow-hidden">
            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
-             <svg className="w-4 h-4 md:w-5 md:h-5 text-emerald-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z"/></svg>
+             <SiGooglegemini className="w-4 h-4 md:w-5 md:h-5 text-emerald-500" />
            </div>
-           <div>
-             <div className="text-white font-bold text-xs md:text-sm tracking-wide">Ask about Rudra</div>
-             <div className="text-[9px] md:text-[10px] text-white/40 uppercase tracking-wider mt-0.5">Interactive Demo</div>
+           <div className="overflow-hidden">
+             <div className="text-white font-bold text-xs md:text-sm tracking-wide truncate">Portfolio Assistant</div>
+             <div className="text-[9px] md:text-[10px] text-white/40 uppercase tracking-wider mt-0.5 animate-pulse">Powered by Gemini</div>
            </div>
          </div>
-         <div className="relative group/dropdown">
+         <div className="relative shrink-0">
            <select 
              value={mood} 
              onChange={(e) => setMood(e.target.value)}
-             className="appearance-none pl-3 pr-8 py-1.5 bg-[#1a1a1a] border border-white/10 hover:border-white/20 rounded-lg text-[10px] md:text-xs text-white/70 focus:outline-none cursor-pointer flex items-center gap-2 font-medium tracking-wide shadow-black shadow-lg"
+             className="appearance-none pl-2 md:pl-3 pr-7 md:pr-8 py-1 md:py-1.5 bg-[#1a1a1a] border border-white/10 hover:border-white/20 rounded-lg text-[10px] md:text-xs text-white/70 focus:outline-none cursor-pointer flex items-center shadow-lg"
            >
              <option value="technical">⚙️ Technical</option>
              <option value="visionary">👁️ Visionary</option>
              <option value="summarized">⚡ Summarized</option>
              <option value="casual">👋 Casual</option>
            </select>
-           <svg className="w-3 h-3 text-white/50 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+           <svg className="w-3 h-3 text-white/50 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
          </div>
       </div>
 
@@ -460,7 +517,7 @@ const ChatWidget = () => {
                 <span className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-emerald-500"></span>
               </div>
             )}
-            <div className={`p-3 md:p-4 text-xs md:text-sm rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.2)] leading-relaxed max-w-[90%] md:max-w-[85%] ${
+            <div className={`p-3 md:p-4 text-xs md:text-sm rounded-2xl shadow-xl leading-relaxed max-w-[85%] md:max-w-[80%] ${
               msg.role === 'user' 
                 ? 'bg-[#22c55e]/20 text-[#22c55e] rounded-tr-sm border border-[#22c55e]/30' 
                 : 'bg-[#1a1a1a] border border-white/5 text-white/80 rounded-tl-sm'
@@ -469,12 +526,27 @@ const ChatWidget = () => {
             </div>
           </div>
         ))}
+        {isTyping && (
+          <div className="flex gap-2 md:gap-3 animate-pulse">
+            <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0 mt-1">
+               <span className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-emerald-500"></span>
+            </div>
+            <div className="p-3 md:p-4 bg-[#1a1a1a] border border-white/5 rounded-2xl rounded-tl-sm">
+              <div className="flex gap-1">
+                <div className="w-1.5 h-1.5 bg-white/30 rounded-full animate-bounce"></div>
+                <div className="w-1.5 h-1.5 bg-white/30 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                <div className="w-1.5 h-1.5 bg-white/30 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="shrink-0">
-        <div className="flex gap-2 flex-wrap mb-3 md:mb-4">
-          {['Tell me about AtlasCV', 'What\'s ECHO-GATE?', 'Why hire Rudra?'].map((q) => (
-             <button key={q} onClick={() => handleSend(q)} className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] md:text-[11px] font-medium text-white/60 hover:text-white hover:border-white/30 cursor-pointer transition-colors shadow-sm text-left">
+        <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+          {['What is AtlasCV?', 'Tell me about ECHO-GATE', 'Why hire Rudra?', 'Current projects'].map((q) => (
+             <button key={q} onClick={() => handleSend(q)} className="shrink-0 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] md:text-[11px] font-medium text-white/60 hover:text-white hover:border-white/30 transition-colors whitespace-nowrap">
                {q}
              </button>
           ))}
@@ -486,11 +558,16 @@ const ChatWidget = () => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend(inputValue)}
-            placeholder="Ask anything..." 
-            className="w-full bg-[#161616] border border-white/10 rounded-xl py-2.5 md:py-3 pl-4 pr-10 text-xs md:text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#22c55e]/50 transition-colors shadow-inner" 
+            placeholder="Ask AI about Rudra..." 
+            className="w-full bg-[#161616] border border-white/10 rounded-xl py-2.5 md:py-3 pl-4 pr-12 text-xs md:text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#22c55e]/50 transition-colors"
+            disabled={isTyping}
           />
-          <button onClick={() => handleSend(inputValue)} className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-lg bg-white/10 text-white/50 hover:text-white hover:bg-white/20 transition-all cursor-pointer">
-            <svg className="w-3.5 h-3.5 md:w-4 md:h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          <button 
+            onClick={() => handleSend(inputValue)} 
+            disabled={isTyping}
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-black transition-all disabled:opacity-50"
+          >
+            <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           </button>
         </div>
       </div>
@@ -509,46 +586,145 @@ export default function Portfolio() {
   // Modal State
   const [selectedProject, setSelectedProject] = useState<{title: string, role: string, description: string, tech: string[], link?: string, github?: string} | null>(null);
 
+  // Blog State
+  const defaultBlogs = useMemo(() => [
+    {
+      id: 1,
+      title: "The Exponential Multiplier: Why AI is More Than Just a Copilot",
+      content: "Exploring how leveraging early adoption of advanced AI frameworks transforms the engineering workflow from incremental to exponential. When you start building with robust AI tooling, the mindset shifts from simply writing code efficiently to architecting entire systems and having the AI serve as your robust compiler and intelligent ideation partner.",
+      date: "Dec 12, 2025",
+      readTime: "5 min read",
+      category: "AI & Tech",
+      excerpt: "Exploring how leveraging early adoption of advanced AI frameworks transforms the engineering workflow from incremental to exponential.",
+    },
+    {
+      id: 2,
+      title: "Architecting FOREFLEX-AMTU: Lessons in Bionic Hardware",
+      content: "A deep dive into the electro-mechanical challenges and CAD iterations behind retrofitting passive prosthetics with active ankle actuators. Hardware is fundamentally unforgiving, testing your ability to iterate structurally while maintaining rigid constraints.",
+      date: "Nov 28, 2025",
+      readTime: "8 min read",
+      category: "Hardware",
+      excerpt: "A deep dive into the electro-mechanical challenges and CAD iterations behind retrofitting passive prosthetics with active ankle actuators.",
+    },
+    {
+      id: 3,
+      title: "Shipping AtlasCV: From Idea to Hundreds of Users in Weeks",
+      content: "How I built and scaled a live AI placement kit platform, the architectural decisions, and the reality of serving real users. Building for actual individuals introduces edge cases that no tutorial will ever prepare you for, emphasizing why shipping fast and listening is essential.",
+      date: "Oct 15, 2025",
+      readTime: "6 min read",
+      category: "Engineering",
+      excerpt: "How I built and scaled a live AI placement kit platform, the architectural decisions, and the reality of serving real users.",
+    }
+  ], []);
+  const [blogs, setBlogs] = useState<any[]>([]);
+  const [loadingBlogs, setLoadingBlogs] = useState(true);
+  const [selectedBlog, setSelectedBlog] = useState<any>(null);
+  const [isCreatingBlog, setIsCreatingBlog] = useState(false);
+  const [newBlogForm, setNewBlogForm] = useState({ title: '', content: '', date: '' });
+
+  useEffect(() => {
+    const saved = localStorage.getItem('user_blogs');
+    setTimeout(() => {
+      if (saved) {
+        setBlogs(JSON.parse(saved));
+      } else {
+        setBlogs(defaultBlogs);
+      }
+      setLoadingBlogs(false);
+    }, 1500);
+  }, [defaultBlogs]);
+
+  const handleCreateBlog = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBlogForm.title || !newBlogForm.content || !newBlogForm.date) return;
+    const newBlog = {
+      id: Date.now(),
+      title: newBlogForm.title,
+      content: newBlogForm.content,
+      excerpt: newBlogForm.content.slice(0, 100) + '...',
+      date: newBlogForm.date,
+      readTime: Math.max(1, Math.ceil(newBlogForm.content.split(' ').length / 200)) + " min read",
+      category: "Update"
+    };
+    const updatedBlogs = [newBlog, ...blogs];
+    setBlogs(updatedBlogs);
+    localStorage.setItem('user_blogs', JSON.stringify(updatedBlogs));
+    setIsCreatingBlog(false);
+    setNewBlogForm({ title: '', content: '', date: '' });
+  };
+
   // Contact Form State
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [formErrors, setFormErrors] = useState<{name?: string, email?: string, message?: string}>({});
+  const [touched, setTouched] = useState<{name?: boolean, email?: boolean, message?: boolean}>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const validationTimeout = useRef<number | null>(null);
+
+  const validateField = (name: string, value: string) => {
+    let error = '';
+    if (name === 'name' && !value.trim()) error = 'Name is required.';
+    if (name === 'email') {
+      if (!value.trim()) error = 'Email is required.';
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Please enter a valid email address.';
+    }
+    if (name === 'message' && !value.trim()) error = 'Message is required.';
+    return error;
+  };
+
+  const handleContactChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    const fieldName = id.replace('contact', '').toLowerCase();
+    
+    setContactForm(prev => ({ ...prev, [fieldName]: value }));
+    setTouched(prev => ({ ...prev, [fieldName]: true }));
+    
+    if (validationTimeout.current) clearTimeout(validationTimeout.current);
+    
+    validationTimeout.current = window.setTimeout(() => {
+      setFormErrors(prev => ({ ...prev, [fieldName]: validateField(fieldName, value) }));
+    }, 400);
+  };
 
   const validateForm = () => {
-    const errors: {name?: string, email?: string, message?: string} = {};
-    if (!contactForm.name.trim()) errors.name = 'Name is required.';
-    if (!contactForm.email.trim()) {
-      errors.email = 'Email is required.';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactForm.email)) {
-      errors.email = 'Please enter a valid email address.';
-    }
-    if (!contactForm.message.trim()) errors.message = 'Message is required.';
+    const errors: {name?: string, email?: string, message?: string} = {
+      name: validateField('name', contactForm.name),
+      email: validateField('email', contactForm.email),
+      message: validateField('message', contactForm.message)
+    };
+    // remove empty strings
+    Object.keys(errors).forEach(key => {
+      if (!errors[key as keyof typeof errors]) delete errors[key as keyof typeof errors];
+    });
     setFormErrors(errors);
+    setTouched({ name: true, email: true, message: true });
     return Object.keys(errors).length === 0;
   };
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
     
     setIsSubmitting(true);
     setSubmitStatus('idle');
     
-    // Simulate API call
-    setTimeout(() => {
-      if (Math.random() > 0.8) {
-        setIsSubmitting(false);
-        setSubmitStatus('error');
-        setTimeout(() => setSubmitStatus('idle'), 5000);
-      } else {
-        setIsSubmitting(false);
-        setSubmitStatus('success');
-        setContactForm({ name: '', email: '', message: '' });
-        setTimeout(() => setSubmitStatus('idle'), 4000);
-      }
-    }, 1500);
+    try {
+      const subject = encodeURIComponent(`Portfolio Contact from ${contactForm.name}`);
+      const body = encodeURIComponent(`Name: ${contactForm.name}\nEmail: ${contactForm.email}\n\nMessage:\n${contactForm.message}`);
+      
+      // Open default email client
+      window.location.href = `mailto:rudra.dev.builds@gmail.com?subject=${subject}&body=${body}`;
+      
+      setSubmitStatus('success');
+      setContactForm({ name: '', email: '', message: '' });
+      setTouched({});
+    } catch (error) {
+      console.error("Submission failed:", error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCopyEmail = (e: React.MouseEvent) => {
@@ -613,10 +789,11 @@ export default function Portfolio() {
   if (!isMounted) return null;
 
   return (
-    <div className="bg-[#080808] min-h-screen text-white font-sans selection:bg-[#22c55e]/30 selection:text-white relative">
+    <div className="bg-[#080808] min-h-screen text-white font-sans selection:bg-[#22c55e]/30 selection:text-white relative overflow-x-hidden w-full max-w-[100vw]">
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes shimmer { 100% { transform: translateX(100%); } }
         @keyframes fadeIn { to { opacity: 1; } }
+        body { overflow-x: hidden; width: 100%; position: relative; }
         body::before { content: ""; position: fixed; inset: 0; background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; }
         .text-glow { text-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
         .border-glow { box-shadow: 0 0 30px rgba(34, 197, 94, 0.12); }
@@ -644,19 +821,20 @@ export default function Portfolio() {
 
       {/* Navbar */}
       <div className="fixed top-0 left-0 h-[2px] bg-gradient-to-r from-[#22c55e] to-[#a3e635] z-[9999]" style={{ width: `${scrollProgress * 100}%` }} />
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${navScrolled ? 'bg-[#080808]/80 backdrop-blur-[20px] border-b border-[#22c55e]/10' : 'bg-transparent border-transparent'}`}>
-        <div className="max-w-6xl mx-auto px-6 md:px-10 h-20 flex items-center justify-between relative">
-          <a href="#hero" className="font-mono font-black text-[24px] tracking-tighter flex items-center gap-1 group relative z-10 w-[80px]">
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${navScrolled ? 'bg-[#080808]/80 backdrop-blur-[20px] border-b border-[#22c55e]/10 py-1' : 'bg-transparent border-transparent py-4'}`}>
+        <div className="max-w-6xl mx-auto px-4 md:px-10 h-16 md:h-20 flex items-center justify-between relative">
+          <a href="#hero" className="font-mono font-black text-[20px] md:text-[24px] tracking-tighter flex items-center gap-1 group relative z-10 w-auto md:w-[80px]">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#22c55e] to-emerald-200 group-hover:to-white transition-all duration-500">RSC</span>
-            <span className="w-2 h-2 rounded-full bg-[#22c55e] animate-pulse group-hover:scale-150 transition-transform duration-300"></span>
+            <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-[#22c55e] animate-pulse group-hover:scale-150 transition-transform duration-300"></span>
           </a>
           
-          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center px-8 py-3 rounded-full bg-[#111]/80 backdrop-blur-md border border-white/10 shadow-[0_0_20px_rgba(0,0,0,0.5)] z-0">
+          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center px-6 lg:px-8 py-3 rounded-full bg-[#111]/80 backdrop-blur-md border border-white/10 shadow-[0_0_20px_rgba(0,0,0,0.5)] z-0">
             <div className="flex items-center gap-6 text-[13px] font-medium text-white/50 tracking-widest uppercase">
               <a href="#work" className="hover:text-white transition-colors duration-200">Work</a>
               <a href="#journey" className="hover:text-white transition-colors duration-200">Journey</a>
               <a href="#about" className="hover:text-white transition-colors duration-200">About</a>
               <a href="#skills" className="hover:text-white transition-colors duration-200">Skills</a>
+              <a href="#insights" className="hover:text-white transition-colors duration-200">Insights</a>
               <a href="#contact" className="hover:text-white transition-colors duration-200">Contact</a>
             </div>
           </div>
@@ -680,7 +858,7 @@ export default function Portfolio() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-8 h-8"><path d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
           <div className="flex flex-col items-center gap-8 text-[32px] font-bold">
-            {['Work', 'Journey', 'About', 'Skills', 'Contact'].map((item, i) => (
+            {['Work', 'Journey', 'About', 'Skills', 'Insights', 'Contact'].map((item, i) => (
               <motion.a key={item} href={`#${item.toLowerCase()}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="text-white hover:text-[#22c55e] transition-colors" onClick={() => setMenuOpen(false)}>
                 {item}
               </motion.a>
@@ -690,36 +868,36 @@ export default function Portfolio() {
       )}
 
       {/* Hero */}
-      <section id="hero" className="min-h-screen flex flex-col justify-center pt-32 pb-20 max-w-6xl mx-auto px-6 md:px-10 relative">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(34,197,94,0.04)_0%,transparent_70%)] pointer-events-none z-0" />
-        <div className="relative z-10 flex flex-col items-start text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-full text-[12px] text-[#22c55e] mb-6 font-medium tracking-wide">
-            <div className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-[pulse_2s_ease-in-out_infinite]" />
+      <section id="hero" className="min-h-screen flex flex-col justify-center pt-28 md:pt-32 pb-16 md:pb-20 max-w-6xl mx-auto px-4 md:px-10 relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] md:w-[800px] h-[300px] md:h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(34,197,94,0.04)_0%,transparent_70%)] pointer-events-none z-0" />
+        <div className="relative z-10 flex flex-col items-start text-left w-full">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-full text-[11px] md:text-[12px] text-[#22c55e] mb-5 md:mb-6 font-medium tracking-wide">
+            <div className="w-1 md:w-1.5 h-1 md:h-1.5 bg-[#22c55e] rounded-full animate-[pulse_2s_ease-in-out_infinite]" />
             Systems & Machine Learning
           </div>
-          <h1 className="text-[clamp(48px,8vw,96px)] font-black leading-[1.1] mb-2 tracking-tight group">
-            <span className="text-white/40 block text-[clamp(24px,4vw,48px)] mb-2 font-mono font-medium tracking-tight">
-              <ScrambleText text="Hello, world. I'm" />
+          <h1 className="text-[clamp(40px,10vw,96px)] font-black leading-[1.05] md:leading-[1.1] mb-2 tracking-tight group w-full">
+            <span className="text-white/40 block text-[clamp(18px,4vw,48px)] mb-1 md:mb-2 font-mono font-medium tracking-tight">
+              <ScrambleText text="Hi, I am" />
             </span>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 md:gap-4 flex-wrap">
               <span className="text-white hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-[#22c55e] hover:to-emerald-200 transition-all duration-300">Rudra</span>
-              <span className="text-[#22c55e] animate-[bounce_2s_infinite] origin-bottom inline-block">👋</span>
+              <span className="text-[#22c55e] animate-[bounce_2s_infinite] origin-bottom inline-block text-[0.8em]">👋</span>
             </div>
-            <span className="gradient-text block mt-2 text-[clamp(24px,4vw,48px)]">Engineering Tomorrow's Innovations</span>
+            <span className="gradient-text block mt-2 text-[clamp(20px,5vw,48px)]">Engineering Tomorrow's Innovations</span>
           </h1>
-          <div className="text-xl md:text-2xl text-white/50 mb-8 mt-2 h-8">
+          <div className="text-lg md:text-2xl text-white/50 mb-8 mt-2 h-auto min-h-[2rem]">
             <TypingText />
           </div>
-          <div className="flex gap-4">
-            <MagneticButton href="#work" className="bg-[#22c55e] text-black font-bold px-8 py-4 rounded-xl shadow-lg shadow-[#22c55e]/20 hover:bg-[#4ade80] hover:scale-[1.02] transition-all cursor-pointer">
+          <div className="flex flex-wrap gap-3 md:gap-4 w-full sm:w-auto">
+            <MagneticButton href="#work" className="w-full sm:w-auto bg-[#22c55e] text-black font-bold px-6 md:px-8 py-3.5 md:py-4 rounded-xl shadow-lg shadow-[#22c55e]/20 hover:bg-[#4ade80] hover:scale-[1.02] transition-all cursor-pointer text-center">
               See My Work ↓
             </MagneticButton>
-            <MagneticButton href="#contact" className="border border-white/10 px-8 py-4 rounded-xl text-white/80 hover:border-[#22c55e] hover:bg-[#22c55e]/10 transition-all cursor-pointer">
+            <MagneticButton href="#contact" className="w-full sm:w-auto border border-white/10 px-6 md:px-8 py-3.5 md:py-4 rounded-xl text-white/80 hover:border-[#22c55e] hover:bg-[#22c55e]/10 transition-all cursor-pointer text-center">
               Let's Talk →
             </MagneticButton>
           </div>
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
-            <div className="bg-[#111] border border-white/5 rounded-[20px] p-6 lg:p-8 flex items-center gap-6 hover:border-emerald-500/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(16,185,129,0.1)]">
+          <div className="mt-12 md:mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 w-full max-w-5xl">
+            <div className="bg-[#111] border border-white/5 rounded-[20px] p-5 md:p-6 lg:p-8 flex items-center gap-4 md:gap-6 hover:border-emerald-500/20 transition-all duration-300 hover:shadow-[0_10px_30px_rgba(16,185,129,0.1)]">
               <div className="w-14 h-14 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 flex items-center justify-center shrink-0 shadow-inner">
                  <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" /></svg>
               </div>
@@ -1226,51 +1404,102 @@ export default function Portfolio() {
         </div>
       </motion.section>
 
+      {/* Insights / Blog */}
+      <motion.section id="insights" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }} className="py-24 md:py-32 max-w-6xl mx-auto px-6 md:px-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <div className="text-[10px] tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">WRITING & THOUGHTS</div>
+            <h2 className="text-[clamp(32px,5vw,52px)] font-black text-white mt-2">
+              Insights
+            </h2>
+          </div>
+          <button onClick={() => setIsCreatingBlog(true)} className="px-6 py-3 bg-[#22c55e]/10 border border-[#22c55e]/30 text-[#22c55e] hover:bg-[#22c55e] hover:text-black hover:scale-105 transition-all outline-none focus:ring-2 focus:ring-[#22c55e] focus:ring-offset-2 focus:ring-offset-[#111] rounded-xl font-bold text-sm flex items-center gap-2 w-fit">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
+            New Post
+          </button>
+        </div>
+        
+        {loadingBlogs ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-12 h-12 border-4 border-[#22c55e]/20 border-t-[#22c55e] rounded-full animate-spin mb-4"></div>
+            <div className="text-white/50 text-sm font-mono animate-pulse">Loading insights...</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {blogs.map((post, i) => (
+              <motion.div key={post.id} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="group relative bg-[#111] border border-white/5 rounded-2xl p-6 hover:border-[#22c55e]/30 transition-all duration-300 shadow-xl hover:-translate-y-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="px-3 py-1 bg-white/5 rounded-full text-[10px] font-mono text-white/50 tracking-wider group-hover:bg-[#22c55e]/10 group-hover:text-[#22c55e] transition-colors">{post.category}</span>
+                    <span className="text-[10px] font-mono text-white/30">{post.readTime}</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3 leading-snug group-hover:text-[#22c55e] transition-colors">
+                    <button onClick={() => setSelectedBlog(post)} aria-label={`Read article: ${post.title}`} className="text-left focus:outline-none focus:ring-2 focus:ring-[#22c55e] rounded-sm w-full">{post.title}</button>
+                  </h3>
+                  <p className="text-sm text-white/50 leading-relaxed line-clamp-3 mb-6">
+                    {post.excerpt}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between mt-auto border-t border-white/5 pt-4">
+                  <span className="text-[11px] text-white/40 font-mono tracking-wide">{post.date}</span>
+                  <button onClick={() => setSelectedBlog(post)} aria-label={`Read article: ${post.title}`} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#22c55e] group-hover:text-black transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#111] focus:ring-[#22c55e]">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </motion.section>
+
       {/* Contact */}
-      <motion.section id="contact" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }} className="py-24 md:py-32 max-w-6xl mx-auto px-6 md:px-10">
+      <motion.section id="contact" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }} className="py-20 md:py-32 max-w-6xl mx-auto px-4 md:px-10 overflow-hidden">
         <div className="text-[10px] tracking-[0.2em] text-[#22c55e] font-bold uppercase mb-1">GET IN TOUCH</div>
         <h2 className="text-[clamp(32px,5vw,52px)] font-black text-white mt-2">
           Contact
         </h2>
-        <p className="text-white/45 text-base mt-2">Always open to internships, projects, or a good conversation.</p>
+        <p className="text-white/45 text-sm md:text-base mt-2">Always open to internships, projects, or a good conversation.</p>
         
-        <div className="mt-12 flex flex-col md:flex-row gap-12">
-          <div className="flex-1 md:w-[45%]">
-            <h3 className="text-[32px] font-bold text-white leading-tight">Want to work together?</h3>
-            <p className="text-white/45 max-w-[560px] mt-4 leading-relaxed">
+        <div className="mt-10 md:mt-12 flex flex-col md:flex-row gap-8 md:gap-12">
+          <div className="flex-1 w-full md:w-[45%]">
+            <h3 className="text-[28px] md:text-[32px] font-bold text-white leading-tight">Want to work together?</h3>
+            <p className="text-white/45 max-w-[560px] mt-4 leading-relaxed text-sm md:text-base">
               I'm currently looking for my first internship in Mobile/Frontend or Full-Stack development. I ship fast, I learn faster.
             </p>
             <div className="grid grid-cols-1 gap-4 mt-8">
-              <div onClick={handleCopyEmail} className="group relative bg-[#111111] border-l-[3px] border-l-transparent border-y border-r border-white/5 rounded-2xl p-6 transition-all duration-200 hover:border-l-[#22c55e] hover:bg-[#141414] hover:shadow-[-4px_0_20px_rgba(34,197,94,0.08)] cursor-pointer">
-                <div className="absolute top-5 right-5 text-white/45 group-hover:text-[#22c55e] group-hover:-translate-y-[2px] group-hover:translate-x-[2px] transition-all">
+              <div onClick={handleCopyEmail} className="group relative bg-[#111111] border-l-[3px] border-l-transparent border-y border-r border-white/5 rounded-2xl p-5 md:p-6 transition-all duration-200 hover:border-l-[#22c55e] hover:bg-[#141414] hover:shadow-[-4px_0_20px_rgba(34,197,94,0.08)] cursor-pointer overflow-hidden">
+                <div className="absolute top-4 md:top-5 right-4 md:right-5 text-white/45 group-hover:text-[#22c55e] group-hover:-translate-y-[2px] group-hover:translate-x-[2px] transition-all">
                   {copiedEmail ? <svg className="w-5 h-5 text-[#22c55e]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg> : <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>}
                 </div>
-                <div className="flex items-center gap-2 mb-4">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-white/45" aria-label="Email"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
-                  <span className="text-xs text-white/45 uppercase tracking-wide">Email</span>
+                <div className="flex items-center gap-2 mb-3 md:mb-4">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 md:w-5 md:h-5 text-white/45" aria-label="Email"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+                  <span className="text-[10px] md:text-xs text-white/45 uppercase tracking-wide">Email</span>
                 </div>
-                <div className="text-[16px] font-semibold text-white break-all">rudra.dev.builds@gmail.com</div>
+                <div className="text-sm md:text-[16px] font-semibold text-white break-all">rudra.dev.builds@gmail.com</div>
               </div>
-              <a href="https://linkedin.com/in/rudrasc-tech" target="_blank" rel="noopener noreferrer" className="group relative bg-[#111111] border-l-[3px] border-l-transparent border-y border-r border-white/5 rounded-2xl p-6 transition-all duration-200 hover:border-l-[#22c55e] hover:bg-[#141414] hover:shadow-[-4px_0_20px_rgba(34,197,94,0.08)]">
-                <div className="absolute top-5 right-5 text-white/45 group-hover:text-[#22c55e] group-hover:-translate-y-[2px] group-hover:translate-x-[2px] transition-all">↗</div>
-                <div className="flex items-center gap-2 mb-4">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-white/45" aria-label="LinkedIn"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 0z"/></svg>
-                  <span className="text-xs text-white/45 uppercase tracking-wide">LinkedIn</span>
+              <a href="https://linkedin.com/in/rudrasc-tech" target="_blank" rel="noopener noreferrer" className="group relative bg-[#111111] border-l-[3px] border-l-transparent border-y border-r border-white/5 rounded-2xl p-5 md:p-6 transition-all duration-200 hover:border-l-[#22c55e] hover:bg-[#141414] hover:shadow-[-4px_0_20px_rgba(34,197,94,0.08)]">
+                <div className="absolute top-4 md:top-5 right-4 md:right-5 text-white/45 group-hover:text-[#22c55e] group-hover:-translate-y-[2px] group-hover:translate-x-[2px] transition-all">↗</div>
+                <div className="flex items-center gap-2 mb-3 md:mb-4">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 md:w-5 md:h-5 text-white/45" aria-label="LinkedIn"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 0z"/></svg>
+                  <span className="text-[10px] md:text-xs text-white/45 uppercase tracking-wide">LinkedIn</span>
                 </div>
-                <div className="text-[16px] font-semibold text-white break-all">linkedin.com/in/rudrasc-tech</div>
+                <div className="text-sm md:text-[16px] font-semibold text-white break-all truncate">linkedin.com/in/rudrasc-tech</div>
               </a>
             </div>
           </div>
           
-          <div className="flex-1 md:w-[55%] bg-[#111] border border-white/5 rounded-2xl p-6 md:p-10 relative overflow-hidden">
+          <div className="flex-1 w-full md:w-[55%] bg-[#111] border border-white/5 rounded-3xl p-6 md:p-10 relative overflow-hidden">
             <h4 className="text-xl font-bold text-white mb-6">Send a Message</h4>
             {submitStatus === 'success' ? (
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="absolute inset-0 bg-[#111] z-10 flex flex-col items-center justify-center p-6 text-center">
                 <div className="w-16 h-16 bg-[#22c55e]/10 rounded-full flex items-center justify-center mb-4 border border-[#22c55e]/30">
                   <svg className="w-8 h-8 text-[#22c55e]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Message Sent</h3>
-                <p className="text-white/60">Thanks for reaching out! I'll get back to you soon.</p>
+                <h3 className="text-2xl font-bold text-white mb-2">Message Opened</h3>
+                <p className="text-white/60 mb-6">Your email client has been opened. Thanks for reaching out!</p>
+                <button onClick={() => setSubmitStatus('idle')} className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-sm font-bold text-white/80 hover:bg-white/10 hover:text-white transition-all outline-none focus:ring-2 focus:ring-[#22c55e]">
+                  Send another message
+                </button>
               </motion.div>
             ) : submitStatus === 'error' ? (
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="absolute inset-0 bg-[#111] z-10 flex flex-col items-center justify-center p-6 text-center">
@@ -1278,29 +1507,32 @@ export default function Portfolio() {
                   <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">Message Failed</h3>
-                <p className="text-white/60">Something went wrong. Please try again later.</p>
+                <p className="text-white/60 mb-6">Something went wrong. Please try again later.</p>
+                <button onClick={() => setSubmitStatus('idle')} className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-sm font-bold text-white/80 hover:bg-white/10 hover:text-white transition-all outline-none focus:ring-2 focus:ring-[#22c55e]">
+                  Try again
+                </button>
               </motion.div>
             ) : null}
-            <form className="flex flex-col gap-4" onSubmit={handleContactSubmit}>
+            <form className="flex flex-col gap-4" onSubmit={handleContactSubmit} noValidate>
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1 flex flex-col gap-1">
-                  <label htmlFor="contactName" className="text-sm text-white/70 font-medium ml-1 cursor-pointer">Name</label>
-                  <input id="contactName" type="text" placeholder="Your Name" value={contactForm.name} onChange={(e) => setContactForm({...contactForm, name: e.target.value})} className={`w-full bg-[#0a0a0a] border ${formErrors.name ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#22c55e]/50 focus:bg-[#141414] transition-all text-sm`} disabled={isSubmitting} />
-                  {formErrors.name && <span className="text-xs text-red-500 ml-1">{formErrors.name}</span>}
+                  <label htmlFor="contactName" className="text-sm text-white/70 font-medium ml-1 cursor-pointer">Name <span className="text-red-500" aria-hidden="true">*</span></label>
+                  <input id="contactName" type="text" placeholder="Your Name" value={contactForm.name} onChange={handleContactChange} aria-required="true" aria-invalid={touched.name && !!formErrors.name} aria-describedby={formErrors.name ? "name-error" : undefined} className={`w-full bg-[#0a0a0a] border ${touched.name && formErrors.name ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#22c55e]/50 focus:bg-[#141414] transition-all text-sm`} disabled={isSubmitting} />
+                  {touched.name && formErrors.name && <span id="name-error" className="text-xs text-red-500 ml-1" role="alert">{formErrors.name}</span>}
                 </div>
                 <div className="flex-1 flex flex-col gap-1">
-                  <label htmlFor="contactEmail" className="text-sm text-white/70 font-medium ml-1 cursor-pointer">Email</label>
-                  <input id="contactEmail" type="email" placeholder="Your Email" value={contactForm.email} onChange={(e) => setContactForm({...contactForm, email: e.target.value})} className={`w-full bg-[#0a0a0a] border ${formErrors.email ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#22c55e]/50 focus:bg-[#141414] transition-all text-sm`} disabled={isSubmitting} />
-                  {formErrors.email && <span className="text-xs text-red-500 ml-1">{formErrors.email}</span>}
+                  <label htmlFor="contactEmail" className="text-sm text-white/70 font-medium ml-1 cursor-pointer">Email <span className="text-red-500" aria-hidden="true">*</span></label>
+                  <input id="contactEmail" type="email" placeholder="Your Email" value={contactForm.email} onChange={handleContactChange} aria-required="true" aria-invalid={touched.email && !!formErrors.email} aria-describedby={formErrors.email ? "email-error" : undefined} className={`w-full bg-[#0a0a0a] border ${touched.email && formErrors.email ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#22c55e]/50 focus:bg-[#141414] transition-all text-sm`} disabled={isSubmitting} />
+                  {touched.email && formErrors.email && <span id="email-error" className="text-xs text-red-500 ml-1" role="alert">{formErrors.email}</span>}
                 </div>
               </div>
               <div className="flex flex-col gap-1">
-                <label htmlFor="contactMessage" className="text-sm text-white/70 font-medium ml-1 cursor-pointer">Message</label>
-                <textarea id="contactMessage" placeholder="Your Message" rows={5} value={contactForm.message} onChange={(e) => setContactForm({...contactForm, message: e.target.value})} className={`bg-[#0a0a0a] border ${formErrors.message ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#22c55e]/50 focus:bg-[#141414] transition-all w-full resize-none text-sm`} disabled={isSubmitting}></textarea>
-                {formErrors.message && <span className="text-xs text-red-500 ml-1">{formErrors.message}</span>}
+                <label htmlFor="contactMessage" className="text-sm text-white/70 font-medium ml-1 cursor-pointer">Message <span className="text-red-500" aria-hidden="true">*</span></label>
+                <textarea id="contactMessage" placeholder="Your Message" rows={5} value={contactForm.message} onChange={handleContactChange} aria-required="true" aria-invalid={touched.message && !!formErrors.message} aria-describedby={formErrors.message ? "message-error" : undefined} className={`bg-[#0a0a0a] border ${touched.message && formErrors.message ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#22c55e]/50 focus:bg-[#141414] transition-all w-full resize-none text-sm`} disabled={isSubmitting}></textarea>
+                {touched.message && formErrors.message && <span id="message-error" className="text-xs text-red-500 ml-1" role="alert">{formErrors.message}</span>}
               </div>
               <div className="flex flex-col md:flex-row gap-4 mt-2">
-                <button type="button" onClick={() => { setContactForm({ name: '', email: '', message: '' }); setFormErrors({}); }} disabled={isSubmitting} className="flex-1 bg-[#1a1a1a] text-white/80 font-bold px-6 py-4 rounded-xl hover:bg-[#222] transition-all text-sm disabled:opacity-70 disabled:cursor-not-allowed border border-white/5 hover:border-white/10">
+                <button type="button" onClick={() => { setContactForm({ name: '', email: '', message: '' }); setFormErrors({}); setTouched({}); }} disabled={isSubmitting} className="flex-1 bg-[#1a1a1a] text-white/80 font-bold px-6 py-4 rounded-xl hover:bg-[#222] transition-all text-sm disabled:opacity-70 disabled:cursor-not-allowed border border-white/5 hover:border-white/10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#111] focus:ring-[#22c55e] outline-none">
                   Reset Form
                 </button>
                 <button type="submit" disabled={isSubmitting} className="flex-1 bg-[#22c55e] text-black font-bold px-6 py-4 rounded-xl hover:bg-[#4ade80] hover:scale-[1.02] transition-all text-sm disabled:opacity-70 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2">
@@ -1337,37 +1569,38 @@ export default function Portfolio() {
             
             <div>
               <h4 className="text-xs font-bold text-white uppercase tracking-[0.2em] mb-6">Navigation</h4>
-              <ul className="flex flex-col gap-4 text-sm text-white/30">
-                <li><a href="#work" className="hover:text-[#22c55e] transition-colors">Featured Work</a></li>
-                <li><a href="#journey" className="hover:text-[#22c55e] transition-colors">Milestones</a></li>
-                <li><a href="#about" className="hover:text-[#22c55e] transition-colors">About Me</a></li>
-                <li><a href="#skills" className="hover:text-[#22c55e] transition-colors">Tech Stack</a></li>
+              <ul className="flex flex-col gap-4 text-sm text-white/50">
+                <li><a href="#work" className="hover:text-[#22c55e] transition-colors focus:ring-2 focus:ring-[#22c55e] outline-none rounded-sm">Featured Work</a></li>
+                <li><a href="#journey" className="hover:text-[#22c55e] transition-colors focus:ring-2 focus:ring-[#22c55e] outline-none rounded-sm">Milestones</a></li>
+                <li><a href="#about" className="hover:text-[#22c55e] transition-colors focus:ring-2 focus:ring-[#22c55e] outline-none rounded-sm">About Me</a></li>
+                <li><a href="#skills" className="hover:text-[#22c55e] transition-colors focus:ring-2 focus:ring-[#22c55e] outline-none rounded-sm">Tech Stack</a></li>
+                <li><a href="#insights" className="hover:text-[#22c55e] transition-colors focus:ring-2 focus:ring-[#22c55e] outline-none rounded-sm">Insights</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="text-xs font-bold text-white uppercase tracking-[0.2em] mb-6">Connect</h4>
-              <ul className="flex flex-col gap-4 text-sm text-white/30">
+              <ul className="flex flex-col gap-4 text-sm text-white/50">
                 <li>
-                  <a href="https://linkedin.com/in/rudrasc-tech" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#22c55e] transition-colors">
+                  <a href="https://linkedin.com/in/rudrasc-tech" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#22c55e] transition-colors focus:ring-2 focus:ring-[#22c55e] outline-none rounded-sm">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                     LinkedIn
                   </a>
                 </li>
                 <li>
-                  <a href="https://github.com/RudraS-Chauhan" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#22c55e] transition-colors">
+                  <a href="https://github.com/RudraS-Chauhan" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#22c55e] transition-colors focus:ring-2 focus:ring-[#22c55e] outline-none rounded-sm">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                     GitHub
                   </a>
                 </li>
                 <li>
-                  <a href="https://ig.me/m/ctrlhuman.io" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#22c55e] transition-colors">
+                  <a href="https://ig.me/m/ctrlhuman.io" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#22c55e] transition-colors focus:ring-2 focus:ring-[#22c55e] outline-none rounded-sm">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
                     Instagram
                   </a>
                 </li>
                 <li>
-                  <a href="https://wa.me/917084150015" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#22c55e] transition-colors">
+                  <a href="https://wa.me/917084150015" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#22c55e] transition-colors focus:ring-2 focus:ring-[#22c55e] outline-none rounded-sm">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12c0 2.19.71 4.22 1.91 5.86L2.61 22l4.28-1.12C8.42 21.6 10.15 22 11.99 22c5.52 0 10-4.48 10-10S17.51 2 11.99 2zm5.55 14.18c-.24.67-1.39 1.25-1.93 1.32-.51.06-1.16.14-3.32-.75-2.61-1.08-4.28-3.76-4.41-3.93-.13-.18-1.06-1.39-1.06-2.66s.66-1.89.89-2.14c.22-.24.49-.3.65-.3h.45c.16 0 .38-.06.6.48.23.57.73 1.8.8 1.94.06.15.11.32.02.5-.09.18-.14.3-.28.46-.14.17-.29.38-.41.51-.14.15-.3.32-.13.62.17.3 1.48 2.45 2.16 3.03.88.75 1.54 1.15 1.83 1.28.29.13.46.11.63-.08.17-.18.73-.85.93-1.14.2-.29.39-.24.66-.14.27.1 1.74.82 2.04.97.3.15.5.23.57.35.07.12.07.7-.17 1.37z"/></svg>
                     WhatsApp
                   </a>
@@ -1460,6 +1693,113 @@ export default function Portfolio() {
                     )}
                   </div>
                 )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {selectedBlog && (
+          <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }} 
+              onClick={() => setSelectedBlog(null)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-pointer" 
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
+              exit={{ opacity: 0, scale: 0.95, y: 20 }} 
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-[#111] border border-white/10 rounded-2xl p-6 md:p-10 max-w-3xl w-full relative z-10 shadow-2xl overflow-y-auto max-h-[90vh]"
+            >
+              <button 
+                onClick={() => setSelectedBlog(null)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors focus:ring-2 focus:ring-[#22c55e] outline-none"
+                aria-label="Close modal"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              <div className="flex flex-col gap-4">
+                <div>
+                  <div className="flex flex-wrap items-center gap-3 mb-4">
+                    <span className="px-3 py-1 bg-white/5 rounded-full text-[10px] font-mono text-white/50 tracking-wider">
+                      {selectedBlog.category}
+                    </span>
+                    <span className="text-[11px] text-white/40 font-mono tracking-wide">
+                      {selectedBlog.date}
+                    </span>
+                    <span className="text-[10px] font-mono text-white/30">
+                      • {selectedBlog.readTime}
+                    </span>
+                  </div>
+                  <h3 className="text-3xl md:text-5xl font-black text-white leading-tight">{selectedBlog.title}</h3>
+                </div>
+                
+                <div className="h-px w-full bg-white/10 my-4" />
+                
+                <div className="prose prose-invert max-w-none">
+                  <p className="text-white/70 text-base md:text-lg leading-relaxed whitespace-pre-wrap">{selectedBlog.content}</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isCreatingBlog && (
+          <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }} 
+              onClick={() => setIsCreatingBlog(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-pointer" 
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
+              exit={{ opacity: 0, scale: 0.95, y: 20 }} 
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-[#111] border border-white/10 rounded-2xl p-6 md:p-10 max-w-2xl w-full relative z-10 shadow-2xl overflow-y-auto max-h-[90vh]"
+            >
+              <button 
+                onClick={() => setIsCreatingBlog(false)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors focus:ring-2 focus:ring-[#22c55e] outline-none"
+                aria-label="Close modal"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              <div className="flex flex-col gap-4">
+                <h3 className="text-3xl font-black text-white mb-2">Create New Post</h3>
+                <form onSubmit={handleCreateBlog} className="flex flex-col gap-4" noValidate>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm text-white/70 font-medium ml-1">Title</label>
+                    <input type="text" required value={newBlogForm.title} onChange={(e) => setNewBlogForm({...newBlogForm, title: e.target.value})} className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#22c55e]/50 max-w-full" placeholder="Post Title" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm text-white/70 font-medium ml-1">Date</label>
+                    <input type="text" required value={newBlogForm.date} onChange={(e) => setNewBlogForm({...newBlogForm, date: e.target.value})} className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#22c55e]/50 max-w-full" placeholder="e.g. May 08, 2026" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm text-white/70 font-medium ml-1">Content</label>
+                    <textarea rows={10} required value={newBlogForm.content} onChange={(e) => setNewBlogForm({...newBlogForm, content: e.target.value})} className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#22c55e]/50 max-w-full resize-none" placeholder="Write your thoughts..." />
+                  </div>
+                  <div className="flex justify-end gap-3 mt-4">
+                    <button type="button" onClick={() => setIsCreatingBlog(false)} className="px-6 py-3 rounded-xl border border-white/10 text-white/70 hover:bg-white/5 transition-all text-sm font-bold focus:ring-2 focus:ring-[#22c55e] outline-none">Cancel</button>
+                    <button type="submit" disabled={!newBlogForm.title || !newBlogForm.date || !newBlogForm.content} className="px-6 py-3 rounded-xl bg-[#22c55e] text-black hover:bg-[#4ade80] transition-all text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-[#22c55e] focus:ring-offset-2 focus:ring-offset-[#111] outline-none">Publish Post</button>
+                  </div>
+                </form>
               </div>
             </motion.div>
           </div>
