@@ -328,84 +328,6 @@ const TiltCard = ({ children, className }: any) => {
   );
 };
 
-const Cursor = () => {
-  const [isTouch, setIsTouch] = useState(true);
-  const dotRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-  const requestRef = useRef<number>(0);
-  const mouse = useRef({ x: 0, y: 0 });
-  const ring = useRef({ x: 0, y: 0 });
-
-  useEffect(() => {
-    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-      setIsTouch(true);
-      return;
-    }
-    setIsTouch(false);
-    document.body.style.cursor = 'none';
-
-    const onMouseMove = (e: MouseEvent) => {
-      mouse.current = { x: e.clientX, y: e.clientY };
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate3d(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%), 0)`;
-      }
-    };
-
-    const render = () => {
-      ring.current.x += (mouse.current.x - ring.current.x) * 0.25;
-      ring.current.y += (mouse.current.y - ring.current.y) * 0.25;
-      if (ringRef.current) {
-        ringRef.current.style.transform = `translate3d(calc(${ring.current.x}px - 50%), calc(${ring.current.y}px - 50%), 0)`;
-      }
-      requestRef.current = requestAnimationFrame(render);
-    };
-
-    window.addEventListener('mousemove', onMouseMove);
-    requestRef.current = requestAnimationFrame(render);
-
-    const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest('a') || target.closest('button') || target.closest('.cursor-pointer')) {
-        if (ringRef.current) {
-          ringRef.current.style.width = '60px';
-          ringRef.current.style.height = '60px';
-          ringRef.current.style.borderColor = 'rgba(34,197,94,1)';
-          ringRef.current.style.backgroundColor = 'rgba(34,197,94,0.06)';
-          ringRef.current.style.mixBlendMode = 'difference';
-        }
-      }
-    };
-    const handleMouseOut = () => {
-      if (ringRef.current) {
-        ringRef.current.style.width = '40px';
-        ringRef.current.style.height = '40px';
-        ringRef.current.style.borderColor = 'rgba(34,197,94,0.6)';
-        ringRef.current.style.backgroundColor = 'transparent';
-        ringRef.current.style.mixBlendMode = 'normal';
-      }
-    };
-
-    window.addEventListener('mouseover', handleMouseOver);
-    window.addEventListener('mouseout', handleMouseOut);
-
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseover', handleMouseOver);
-      window.removeEventListener('mouseout', handleMouseOut);
-      if (requestRef.current) cancelAnimationFrame(requestRef.current);
-      document.body.style.cursor = 'auto';
-    };
-  }, []);
-
-  if (isTouch) return null;
-
-  return (
-    <>
-      <div ref={dotRef} className="fixed top-0 left-0 w-2 h-2 bg-[#22c55e] rounded-full pointer-events-none z-[9999]" />
-      <div ref={ringRef} className="fixed top-0 left-0 w-10 h-10 border-[1.5px] border-[#22c55e]/60 rounded-full pointer-events-none z-[9998] transition-[width,height,background-color,border-color] duration-200" />
-    </>
-  );
-};
 
 const ChatWidget = () => {
   const [mood, setMood] = useState('technical');
@@ -595,7 +517,7 @@ export default function Portfolio() {
       date: "Dec 12, 2025",
       readTime: "5 min read",
       category: "AI & Tech",
-      excerpt: "Exploring how leveraging early adoption of advanced AI frameworks transforms the engineering workflow from incremental to exponential.",
+      excerpt: "Leveraging advanced AI frameworks changes the engineering workflow from mere linear progression to exponential leaps in productivity. In this article, I explore how shifting the mindset from standard coding to high-level architecture with AI leads to building much larger and more robust systems. Find out how AI serves as an intelligent ideation partner rather than just a code generator.",
     },
     {
       id: 2,
@@ -604,7 +526,7 @@ export default function Portfolio() {
       date: "Nov 28, 2025",
       readTime: "8 min read",
       category: "Hardware",
-      excerpt: "A deep dive into the electro-mechanical challenges and CAD iterations behind retrofitting passive prosthetics with active ankle actuators.",
+      excerpt: "Building physical hardware involves entirely different challenges compared to pure software development. Join me in a deep dive into the electro-mechanical hurdles and iterative CAD design process behind retrofitting passive prosthetics with active ankle actuators. Learn why rigid constraints make hardware development both challenging and intensely rewarding.",
     },
     {
       id: 3,
@@ -613,7 +535,7 @@ export default function Portfolio() {
       date: "Oct 15, 2025",
       readTime: "6 min read",
       category: "Engineering",
-      excerpt: "How I built and scaled a live AI placement kit platform, the architectural decisions, and the reality of serving real users.",
+      excerpt: "Taking an idea from inception to a live platform used by hundreds of people is a transformational journey. This post breaks down the core architectural choices that powered AtlasCV and the harsh reality of dealing with real-world edge cases. Discover the lessons learned from failing pipelines, user feedback, and why shipping the MVP is the most critical step.",
     }
   ], []);
   const [blogs, setBlogs] = useState<any[]>([]);
@@ -804,7 +726,6 @@ export default function Portfolio() {
         @keyframes fadeCycleOffset { 0%, 45% { opacity: 0; visibility: hidden; } 50%, 95% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden; } }
         @keyframes slide { from { background-position: 0 0; } to { background-position: 40px 40px; } }
       `}} />
-      <Cursor />
 
       {/* Loading Screen */}
       {isLoading && (
