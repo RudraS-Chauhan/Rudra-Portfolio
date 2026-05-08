@@ -6,6 +6,10 @@
   }
 }
 
+.hide-cursor, .hide-cursor * {
+  cursor: none !important;
+}
+
 @theme {
   --animate-marquee: marquee 30s linear infinite;
   

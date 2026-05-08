@@ -9,12 +9,17 @@ import {
 } from 'react-icons/si';
 import { FaJava, FaDatabase, FaRobot, FaMicrochip, FaCogs, FaProjectDiagram } from 'react-icons/fa';
 import { GoogleGenAI } from "@google/genai";
+import { CustomCursor } from './CustomCursor';
 
 let ai: GoogleGenAI | null = null;
 try {
-  // Safely check for process/import.meta.env to prevent white screens in Vercel
-  const apiKey = (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) || 
-                 (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_GEMINI_API_KEY);
+  // Safely check without throwing ReferenceError for process
+  let apiKey = '';
+  if (typeof process !== 'undefined' && process.env && process.env.GEMINI_API_KEY) {
+    apiKey = process.env.GEMINI_API_KEY;
+  } else if (typeof import.meta !== 'undefined' && typeof (import.meta as any).env !== 'undefined') {
+    apiKey = (import.meta as any).env.GEMINI_API_KEY;
+  }
   
   if (apiKey) {
     ai = new GoogleGenAI({ apiKey });
@@ -257,6 +262,33 @@ const CountUp = ({ end, suffix = '' }: { end: number, suffix?: string }) => {
   );
 };
 
+const ImageWithSkeleton = ({ src, alt, className, imgClassName }: { src: string, alt: string, className?: string, imgClassName?: string }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  return (
+    <div className={`relative overflow-hidden ${className || ''}`}>
+      {!isLoaded && !hasError && (
+        <div className="absolute inset-0 bg-[#1a1a1a] animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] flex items-center justify-center">
+           <svg className="w-10 h-10 text-white/5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+           </svg>
+        </div>
+      )}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        className={`w-full h-full object-cover transition-all duration-700 ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'} ${imgClassName || ''}`}
+        onLoad={() => setIsLoaded(true)}
+        onError={() => setHasError(true)}
+        style={{ display: hasError ? 'none' : 'block' }}
+      />
+    </div>
+  );
+};
+
 const MagneticButton = ({ children, className, href, onClick }: any) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isTouch, setIsTouch] = useState(true);
@@ -348,10 +380,12 @@ const ChatWidget = () => {
     { role: 'system', text: "Hello! I'm Rudra's AI assistant. I can answer questions about his skills, projects, and availability. What would you like to know?" }
   ]);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -448,7 +482,7 @@ const ChatWidget = () => {
          </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto flex flex-col gap-3 md:gap-4 mb-4 md:mb-6 pr-1 custom-scrollbar">
+      <div ref={chatContainerRef} className="flex-1 overflow-y-auto flex flex-col gap-3 md:gap-4 mb-4 md:mb-6 pr-1 custom-scrollbar">
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-2 md:gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
             {msg.role === 'system' && (
@@ -479,7 +513,6 @@ const ChatWidget = () => {
             </div>
           </div>
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       <div className="shrink-0">
@@ -732,6 +765,7 @@ export default function Portfolio() {
 
   return (
     <div className="bg-[#080808] min-h-screen text-white font-sans selection:bg-[#22c55e]/30 selection:text-white relative overflow-x-hidden w-full max-w-[100vw]">
+      <CustomCursor />
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes shimmer { 100% { transform: translateX(100%); } }
         @keyframes fadeIn { to { opacity: 1; } }
@@ -936,7 +970,7 @@ export default function Portfolio() {
                     </div>
                     <div className="mx-auto bg-[#0a0a0a] px-3 py-1 rounded text-[10px] font-mono text-[#22c55e]">atlascv.vercel.app/dashboard</div>
                   </div>
-                  <img src="/atlascv-2.png" alt="AtlasCV Dashboard Screen" loading="lazy" decoding="async" className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105" onError={(e) => e.currentTarget.style.display = 'none'} />
+                  <ImageWithSkeleton src="/atlascv-2.png" alt="AtlasCV Dashboard Screen" className="w-full h-full flex-1" imgClassName="object-top group-hover:scale-105" />
                 </div>
               </div>
             </div>
@@ -996,7 +1030,7 @@ export default function Portfolio() {
                 </button>
               </div>
               <div className="mt-8 w-full rounded-xl overflow-hidden border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.3)] relative">
-                <img src="/foreflex-amtu.jpg" alt="FOREFLEX-AMTU Schematic" loading="lazy" decoding="async" className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105" onError={(e) => e.currentTarget.style.display = 'none'} />
+                <ImageWithSkeleton src="/foreflex-amtu.jpg" alt="FOREFLEX-AMTU Schematic" className="w-full h-auto aspect-video" imgClassName="group-hover:scale-105" />
               </div>
             </TiltCard>
           </div>
@@ -1043,7 +1077,7 @@ export default function Portfolio() {
               </div>
               <div className="flex-1 md:w-[50%] flex items-center justify-center mt-8 md:mt-0">
                 <div className="w-full h-full min-h-[300px] rounded-xl overflow-hidden border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.3)] relative group flex items-center justify-center bg-[#0a0a0a]">
-                  <img src="/velocity-io.jpg" alt="Velocity.io Web Consulting" loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" onError={(e) => e.currentTarget.style.display = 'none'} />
+                  <ImageWithSkeleton src="/velocity-io.jpg" alt="Velocity.io Web Consulting" className="absolute inset-0 w-full h-full" imgClassName="group-hover:scale-105" />
                 </div>
               </div>
             </div>
@@ -1149,12 +1183,7 @@ export default function Portfolio() {
               <div className="absolute inset-0 rounded-full border border-white/5 m-3 pointer-events-none" />
               
               <div className="w-full h-full rounded-full bg-[#111] shadow-[0_0_40px_rgba(34,197,94,0.15)] flex flex-col items-center justify-center overflow-hidden relative group border border-white/10 z-20">
-                <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#0a0a0a]">
-                   <svg className="w-1/2 h-1/2 text-[#22c55e]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                   </svg>
-                </div>
-                <img src="/image.jpg" alt="Rudra Singh Chauhan" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover z-20 opacity-0 transition-opacity duration-300" onLoad={(e) => e.currentTarget.style.opacity = '1'} onError={(e) => e.currentTarget.style.display = 'none'} />
+                <ImageWithSkeleton src="/image.jpg" alt="Rudra Singh Chauhan" className="absolute inset-0 w-full h-full" imgClassName="z-20 object-cover" />
               </div>
               
               {/* Floating badges */}
