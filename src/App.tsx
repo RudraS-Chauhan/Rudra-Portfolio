@@ -10,7 +10,18 @@ import {
 import { FaJava, FaDatabase, FaRobot, FaMicrochip, FaCogs, FaProjectDiagram } from 'react-icons/fa';
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let ai: GoogleGenAI | null = null;
+try {
+  // Safely check for process/import.meta.env to prevent white screens in Vercel
+  const apiKey = (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) || 
+                 (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_GEMINI_API_KEY);
+  
+  if (apiKey) {
+    ai = new GoogleGenAI({ apiKey });
+  }
+} catch (e) {
+  console.error("Gemini API key is not set or invalid.", e);
+}
 
 const countUpCurve = (progress: number) => 1 - Math.pow(1 - progress, 3);
 
@@ -340,7 +351,7 @@ const ChatWidget = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
 
   useEffect(() => {
@@ -381,6 +392,12 @@ const ChatWidget = () => {
         - If you don't know something, be honest but mention Rudra's broad learning capacity.
         - Encourage the user to contact Rudra for specific inquiries.
       `;
+
+      if (!ai) {
+        setMessages(prev => [...prev, { role: 'system', text: "The AI assistant is currently unavailable. Please setup your Gemini API Key in the environment variables." }]);
+        setIsTyping(false);
+        return;
+      }
 
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
@@ -659,6 +676,9 @@ export default function Portfolio() {
   useEffect(() => {
     setIsMounted(true);
     document.title = "Rudra Singh Chauhan — Builder";
+    
+    // Ensure we start at the top
+    window.scrollTo(0, 0);
 
     const handleScroll = () => {
       const totalScroll = document.documentElement.scrollTop;
