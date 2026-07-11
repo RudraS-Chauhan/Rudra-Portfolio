@@ -413,7 +413,7 @@ const ChatWidget = () => {
         Key information about Rudra:
         - Role: Lead Engineer @ ECHO-GATE Robotics, AI & Full-Stack Developer.
         - Core Projects:
-          1. AtlasCV: AI Placement Kit Generator (Next.js, Gemini API, Tailwind). Helps students get ATS resumes and LinkedIn profiles in 60s.
+          1. AtlasCV: AI Placement Kit Generator (Next.js, Gemini API, Tailwind). Helps students get ATS resumes and LinkedIn profiles in 60s. Note: AtlasCV is currently in private beta with early testers and has zero public users yet.
           2. ECHO-GATE: Leading architectural development for centralized robotics and automated operations core.
           3. FOREFLEX-AMTU: Bionic ankle actuator research (Hardware/CAD/SolidWorks).
           4. Fold_Fantasia: Previous 3D origami venture (2.5x growth).
@@ -423,6 +423,7 @@ const ChatWidget = () => {
         
         Guidelines:
         - Keep responses concise and helpful.
+        - When asked about AtlasCV's user numbers, traction, or status, always state that the platform is currently in a private beta phase with early testers and has zero public users yet. Never claim it has "hundreds of users" or is fully launched publicly.
         - If you don't know something, be honest but mention Rudra's broad learning capacity.
         - Encourage the user to contact Rudra for specific inquiries.
       `;
@@ -580,12 +581,12 @@ export default function Portfolio() {
     },
     {
       id: 3,
-      title: "Shipping AtlasCV: From Idea to Hundreds of Users in Weeks",
-      content: "How I built and scaled a live AI placement kit platform, the architectural decisions, and the reality of serving real users. Building for actual individuals introduces edge cases that no tutorial will ever prepare you for, emphasizing why shipping fast and listening is essential.",
+      title: "Shipping AtlasCV: From Idea to a Working MVP in Weeks",
+      content: "How I built and launched an AI placement kit platform, the architectural decisions, and the reality of preparing for early testers. Building a functional prototype introduces edge cases that no tutorial will ever prepare you for, emphasizing why shipping fast and listening is essential.",
       date: "Oct 15, 2025",
       readTime: "6 min read",
       category: "Engineering",
-      excerpt: "Taking an idea from inception to a live platform used by hundreds of people is a transformational journey. This post breaks down the core architectural choices that powered AtlasCV and the harsh reality of dealing with real-world edge cases. Discover the lessons learned from failing pipelines, user feedback, and why shipping the MVP is the most critical step.",
+      excerpt: "Taking an idea from inception to a live platform currently in private beta testing is a transformational journey. This post breaks down the core architectural choices that powered AtlasCV and the reality of dealing with real-world feedback. Discover the lessons learned from early pipelines, user feedback, and why shipping the MVP is the most critical step.",
     }
   ], []);
   const [blogs, setBlogs] = useState<any[]>([]);
@@ -894,11 +895,11 @@ export default function Portfolio() {
             
             <div className="bg-[#111] border border-white/5 rounded-[20px] p-6 lg:p-8 flex items-center gap-6 hover:border-amber-500/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(245,158,11,0.1)]">
               <div className="w-14 h-14 rounded-2xl border border-amber-500/20 bg-amber-500/10 flex items-center justify-center shrink-0 shadow-inner">
-                 <svg className="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg>
+                 <svg className="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
               </div>
               <div className="flex flex-col justify-center">
-                <div className="text-3xl lg:text-4xl font-black tracking-tight text-white mb-0.5 font-sans">2.5x</div>
-                <div className="text-[11px] lg:text-xs text-white/50 font-medium leading-[1.3] truncate max-w-full">Growth via Tech</div>
+                <div className="text-3xl lg:text-4xl font-black tracking-tight text-white mb-0.5 font-sans">3+</div>
+                <div className="text-[11px] lg:text-xs text-white/50 font-medium leading-[1.3] truncate max-w-full">Technologies Mastered</div>
               </div>
             </div>
           </div>
@@ -1037,7 +1038,10 @@ export default function Portfolio() {
 
           {/* Other Projects / Freelance */}
           <TiltCard className="w-full bg-[#111] border border-white/5 rounded-[20px] p-6 md:p-10 hover:border-blue-500/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(59,130,246,0.1)] flex flex-col">
-            <span className="self-start px-2 py-0.5 bg-blue-500/10 border border-blue-500/30 rounded text-xs text-blue-500 font-mono uppercase">FREELANCE & EXPERIMENTS</span>
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="px-2 py-0.5 bg-blue-500/10 border border-blue-500/30 rounded text-xs text-blue-500 font-mono uppercase">FREELANCE & EXPERIMENTS</span>
+              <span className="px-2 py-0.5 bg-white/5 border border-white/10 rounded text-xs text-white/40 font-mono uppercase">Concept Project — Not a Paid Client Engagement</span>
+            </div>
             <div className="flex flex-col md:flex-row gap-8 mt-5">
               <div className="flex-1 md:w-[50%]">
                 <h3 className="text-[24px] font-bold text-white mt-3">Web & AI Consulting</h3>
@@ -1199,7 +1203,7 @@ export default function Portfolio() {
           <div className="w-full md:w-[60%] flex flex-col">
             <span className="hidden md:block text-[100px] leading-[0.8] text-[#22c55e] font-serif opacity-60 -mb-4">"</span>
             <p className="text-[15px] sm:text-[16px] md:text-[18px] leading-[1.8] text-white/75 font-normal">
-              <TypewriterQuote quote="I'm a builder. I don't wait for graduation to start creating. From launching a live AI platform serving hundreds of students to architecting bionic hardware like the FOREFLEX-AMTU, I turn complex problems into scalable solutions. I use AI not as a crutch, but as an exponential force multiplier to engineer the future—today." />
+              <TypewriterQuote quote="I'm a builder. I don't wait for graduation to start creating. From launching a live AI platform currently in private beta with early testers to architecting bionic hardware like the FOREFLEX-AMTU, I turn complex problems into scalable solutions. I use AI not as a crutch, but as an exponential force multiplier to engineer the future—today." />
             </p>
             <div className="flex flex-wrap gap-3 md:gap-4 mt-8">
               <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="flex-1 md:flex-none text-center text-xs md:text-sm font-semibold text-[#22c55e] hover:text-black border border-[#22c55e]/30 px-6 md:px-8 py-3 md:py-3.5 rounded-xl hover:bg-[#22c55e] transition-all">
