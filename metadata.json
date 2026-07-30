@@ -1,6 +1,6 @@
 {
-  "name": "Portfolio",
-  "description": "",
+  "name": "Rudra -- Lead Engineer & AI Builder",
+  "description": "Personal engineering portfolio of Rudra Singh: Lead Engineer @ ECHO-GATE Robotics, creator of AtlasCV AI placement kit generator, FOREFLEX-AMTU bionic actuator research, and 3D web systems.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

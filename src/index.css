@@ -1,20 +1,41 @@
 @import "tailwindcss";
 
 @layer base {
-  html {
+  *, ::before, ::after {
+    box-sizing: border-box;
+  }
+  
+  html, body, #root {
+    background-color: #0C0C0C;
+    margin: 0;
+    padding: 0;
+    font-family: 'Kanit', sans-serif;
+    color: #D7E2EA;
     scroll-behavior: smooth;
   }
 }
 
-.hide-cursor, .hide-cursor * {
-  cursor: none !important;
+.hero-heading {
+  background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-@theme {
-  --animate-marquee: marquee 30s linear infinite;
-  
-  @keyframes marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(calc(-50% - 0.5rem)); }
-  }
+/* Custom scrollbar for clean dark theme */
+::-webkit-scrollbar {
+  width: 8px;
 }
+
+::-webkit-scrollbar-track {
+  background: #0C0C0C;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #222;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+
