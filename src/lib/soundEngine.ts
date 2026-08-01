@@ -2,10 +2,20 @@
 
 class SoundEngine {
   private ctx: AudioContext | null = null;
-  private isMuted: boolean = false; // Enabled by default as requested
+  private isMuted: boolean = false; // Default state
 
   constructor() {
-    // AudioContext will be initialized on first user interaction or explicit toggle
+    // Read cached audio preference from localStorage if present
+    if (typeof window !== 'undefined') {
+      try {
+        const savedMute = localStorage.getItem('portfolio_audio_muted');
+        if (savedMute !== null) {
+          this.isMuted = savedMute === 'true';
+        }
+      } catch {
+        // Fallback if localStorage access is restricted
+      }
+    }
   }
 
   private initCtx() {
@@ -20,8 +30,19 @@ class SoundEngine {
     }
   }
 
+  private persistMuteState() {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('portfolio_audio_muted', String(this.isMuted));
+      } catch {
+        // Ignore storage errors
+      }
+    }
+  }
+
   public toggleMute(): boolean {
     this.isMuted = !this.isMuted;
+    this.persistMuteState();
     if (!this.isMuted) {
       this.initCtx();
       this.playChime(600, 900, 0.15); // Unmute chime
@@ -31,6 +52,7 @@ class SoundEngine {
 
   public setMuted(muted: boolean) {
     this.isMuted = muted;
+    this.persistMuteState();
     if (!muted) {
       this.initCtx();
     }

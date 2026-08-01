@@ -4,6 +4,7 @@ import { SEO } from './components/SEO';
 import { ScrollProgressBar } from './components/ScrollProgressBar';
 import { InitialLoader } from './components/InitialLoader';
 import { AudioToggle } from './components/AudioToggle';
+import { ThemeToggle } from './components/ThemeToggle';
 import { CustomCursor } from './components/CustomCursor';
 import { SectionDock } from './components/SectionDock';
 import { ResumeModal } from './components/ResumeModal';
@@ -28,6 +29,8 @@ const sectionFadeInVariants: Variants = {
     transition: {
       duration: 0.7,
       ease: 'easeInOut',
+      staggerChildren: 0.12,
+      delayChildren: 0.05,
     },
   },
 };
@@ -127,6 +130,10 @@ export function App() {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               setActiveSection(id);
+              const meta = sectionMetadata[id];
+              if (meta) {
+                document.title = `Rudra Singh Chauhan | ${meta.section}`;
+              }
             }
           });
         },
@@ -152,8 +159,9 @@ export function App() {
       {/* Interactive Custom Mouse Follower */}
       <CustomCursor />
 
-      {/* Floating Audio Mute/Unmute Toggle */}
+      {/* Floating Audio Mute/Unmute Toggle & Theme Preference Toggle */}
       <AudioToggle />
+      <ThemeToggle />
 
       {/* Section Dock for Side Dot Navigation */}
       <SectionDock />
