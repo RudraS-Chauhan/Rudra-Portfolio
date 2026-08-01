@@ -2,6 +2,7 @@ import React from 'react';
 import { ContactButton } from './ContactButton';
 import { SocialLinks } from './SocialLinks';
 import { Mail, ArrowUp } from 'lucide-react';
+import { SEO } from './SEO';
 
 interface FooterSectionProps {
   onContactClick: () => void;
@@ -15,7 +16,7 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ onContactClick }) 
   return (
     <footer
       id="contact"
-      className="bg-[#0C0C0C] text-[#D7E2EA] pt-20 pb-12 px-5 sm:px-8 md:px-10 border-t border-white/10 w-full select-none relative z-20"
+      className="bg-[#0C0C0C] text-[#D7E2EA] pt-16 sm:pt-20 pb-12 px-5 sm:px-8 md:px-10 border-t border-white/10 w-full select-none relative z-20"
     >
       <div className="max-w-6xl mx-auto flex flex-col gap-16">
         {/* Top Call to Action */}

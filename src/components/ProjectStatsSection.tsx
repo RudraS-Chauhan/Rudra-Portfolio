@@ -46,26 +46,6 @@ const statsData: ProjectMetricData[] = [
     latency: 12,
     color: '#BE4C00',
   },
-  {
-    title: 'ctrlhuman.io',
-    shortName: 'ctrlhuman.io',
-    category: 'Instagram Client Channel',
-    loc: 9600,
-    commits: 85,
-    users: 60,
-    latency: 40,
-    color: '#00A896',
-  },
-  {
-    title: 'Fold_Fantasia',
-    shortName: 'Fold_Fantasia',
-    category: 'Paper Hardware Startup',
-    loc: 0, // Paper Hardware Startup (Origami creations, 0 software LOC)
-    commits: 52,
-    users: 50, // 50+ Origami paper designs sold
-    latency: 0, // N/A (Hardware paper creation)
-    color: '#3A86EF',
-  },
 ];
 
 type MetricType = 'loc' | 'commits' | 'users' | 'latency';
@@ -321,7 +301,120 @@ export const ProjectStatsSection: React.FC = () => {
   const totalCommits = statsData.reduce((acc, curr) => acc + curr.commits, 0);
 
   return (
-    <div className="w-full mt-16 sm:mt-24 pt-16 border-t border-white/10 space-y-20">
+    <div className="relative w-full mt-12 sm:mt-16 pt-12 border-t border-white/10 space-y-16">
+      {/* 0. GITHUB PROFILE & LIVE REPOSITORY SHOWCASE */}
+      <div>
+        <FadeIn delay={0} y={30}>
+          <div className="bg-gradient-to-br from-[#161618] via-[#121212] to-[#0D0D0E] border border-white/15 rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+            {/* Background glow accent */}
+            <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#B600A8]/15 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-white/10 relative z-10">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 text-white shadow-lg">
+                  <GitCommit className="w-8 h-8 text-[#B600A8]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-bold uppercase tracking-widest text-[#B600A8] bg-[#B600A8]/15 border border-[#B600A8]/30 px-3 py-0.5 rounded-full">
+                      GitHub Activity
+                    </span>
+                    <span className="text-xs font-semibold text-[#D7E2EA]/60">
+                      @RudraS-Chauhan
+                    </span>
+                  </div>
+                  <h3 className="text-2xl sm:text-4xl font-black uppercase tracking-tight text-white mt-1">
+                    GitHub Codebase Showcase
+                  </h3>
+                </div>
+              </div>
+
+              <a
+                href="https://github.com/RudraS-Chauhan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#B600A8] to-[#7621B0] hover:from-[#7621B0] hover:to-[#B600A8] text-white font-bold text-xs sm:text-sm uppercase tracking-wider px-6 py-3.5 rounded-full border border-white/20 shadow-lg hover:shadow-[0_0_25px_rgba(182,0,168,0.5)] transition-all transform hover:-translate-y-0.5 shrink-0"
+              >
+                <span>Visit GitHub Profile</span>
+                <Rocket className="w-4 h-4" />
+              </a>
+            </div>
+
+            {/* Repositories Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 relative z-10">
+              <a
+                href="https://github.com/RudraS-Chauhan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#B600A8]/50 p-5 rounded-2xl transition-all group flex flex-col justify-between gap-3"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-sm text-white group-hover:text-[#B600A8] transition-colors">
+                      AtlasCV Platform
+                    </span>
+                    <Code className="w-4 h-4 text-[#B600A8]" />
+                  </div>
+                  <p className="text-xs text-[#D7E2EA]/70 line-clamp-2">
+                    AI Placement Kit generator built with Gemini 2.5 API, React, and TypeScript.
+                  </p>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-[#D7E2EA]/50 font-mono pt-2 border-t border-white/5">
+                  <span>TypeScript</span>
+                  <span className="text-[#B600A8] font-bold">18.5k LOC</span>
+                </div>
+              </a>
+
+              <a
+                href="https://github.com/RudraS-Chauhan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#7621B0]/50 p-5 rounded-2xl transition-all group flex flex-col justify-between gap-3"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-sm text-white group-hover:text-[#7621B0] transition-colors">
+                      EventFit AI
+                    </span>
+                    <Code className="w-4 h-4 text-[#7621B0]" />
+                  </div>
+                  <p className="text-xs text-[#D7E2EA]/70 line-clamp-2">
+                    Smart catalog & offline outfit recommendation matrix engine.
+                  </p>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-[#D7E2EA]/50 font-mono pt-2 border-t border-white/5">
+                  <span>Next.js / TS</span>
+                  <span className="text-[#7621B0] font-bold">12.4k LOC</span>
+                </div>
+              </a>
+
+              <a
+                href="https://github.com/RudraS-Chauhan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#BE4C00]/50 p-5 rounded-2xl transition-all group flex flex-col justify-between gap-3"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-sm text-white group-hover:text-[#BE4C00] transition-colors">
+                      ECHO-GATE Core
+                    </span>
+                    <Gauge className="w-4 h-4 text-[#BE4C00]" />
+                  </div>
+                  <p className="text-xs text-[#D7E2EA]/70 line-clamp-2">
+                    Autonomous robotics low-latency control software & hardware ROS modules.
+                  </p>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-[#D7E2EA]/50 font-mono pt-2 border-t border-white/5">
+                  <span>C++ / Embedded</span>
+                  <span className="text-[#BE4C00] font-bold">24.0k LOC</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </FadeIn>
+      </div>
+
       {/* 1. LIGHTWEIGHT PROJECT IMPACT HORIZONTAL BAR CHART */}
       <div>
         <FadeIn delay={0} y={30}>
@@ -425,10 +518,10 @@ export const ProjectStatsSection: React.FC = () => {
               <span className="text-[11px] uppercase tracking-wider text-[#D7E2EA]/60 mt-0.5">AtlasCV Speed</span>
             </div>
 
-            <div className="bg-[#121212] border border-white/10 rounded-2xl p-4 flex flex-col items-center text-center hover:border-[#00A896]/40 transition-colors">
-              <Award className="w-5 h-5 text-[#00A896] mb-1" />
-              <span className="text-2xl sm:text-3xl font-black text-white">@ctrlhuman.io</span>
-              <span className="text-[11px] uppercase tracking-wider text-[#D7E2EA]/60 mt-0.5">Instagram Channel</span>
+            <div className="bg-[#121212] border border-white/10 rounded-2xl p-4 flex flex-col items-center text-center hover:border-[#B600A8]/40 transition-colors">
+              <Award className="w-5 h-5 text-[#B600A8] mb-1" />
+              <span className="text-2xl sm:text-3xl font-black text-white">3 Flagships</span>
+              <span className="text-[11px] uppercase tracking-wider text-[#D7E2EA]/60 mt-0.5">Core Production Systems</span>
             </div>
           </div>
         </FadeIn>
@@ -482,7 +575,7 @@ export const ProjectStatsSection: React.FC = () => {
               )}
             </div>
 
-            <div ref={containerRef} className="w-full">
+            <div ref={containerRef} className="relative w-full">
               <svg ref={svgRef} className="w-full h-auto overflow-visible" />
             </div>
           </div>

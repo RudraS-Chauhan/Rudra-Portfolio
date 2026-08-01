@@ -1,12 +1,13 @@
 import React from 'react';
 import { FadeIn } from './FadeIn';
 import { GraduationCap, Award, BookOpen, Calendar, MapPin } from 'lucide-react';
+import { SEO } from './SEO';
 
 export const EducationSection: React.FC = () => {
   return (
     <section
       id="education"
-      className="bg-[#0C0C0C] text-[#D7E2EA] px-5 sm:px-8 md:px-12 py-20 sm:py-24 relative z-20 border-t border-white/10"
+      className="bg-[#0C0C0C] text-[#D7E2EA] px-5 sm:px-8 md:px-12 py-16 sm:py-24 relative z-10 border-t border-white/10"
     >
       <div className="max-w-6xl mx-auto">
         <FadeIn delay={0} y={30}>
@@ -31,50 +32,62 @@ export const EducationSection: React.FC = () => {
                   <BookOpen className="w-4 h-4" /> Undergraduate Degree
                 </div>
                 <h3 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-white">
-                  Bachelor of Technology (B.Tech)
+                  Bachelor of Technology (B.Tech) — AI
                 </h3>
-                <p className="text-sm sm:text-base text-[#D7E2EA]/70 mt-1">
-                  Computer Science & Engineering / AI & Systems Specialization
+                <p className="text-sm sm:text-base text-[#D7E2EA]/70 mt-1 font-semibold">
+                  Galgotias University (Sept 2025 – 2029) • Artificial Intelligence Major
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row md:flex-col items-start md:items-end gap-2 text-xs sm:text-sm text-[#D7E2EA]/60">
                 <span className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-full">
-                  <Calendar className="w-3.5 h-3.5 text-[#B600A8]" /> Enrolled / Active Student
+                  <Calendar className="w-3.5 h-3.5 text-[#B600A8]" /> Enrolled B.Tech AI
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#B600A8]" /> India
+                  <MapPin className="w-3.5 h-3.5 text-[#B600A8]" /> Greater Delhi Area, India
                 </span>
               </div>
             </div>
 
-            {/* Core Philosophy & Accomplishments */}
+            {/* Senior Secondary & Core Academic Projects */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8">
               <div>
                 <h4 className="text-xs uppercase font-bold tracking-widest text-[#D7E2EA]/50 mb-3 flex items-center gap-2">
-                  <Award className="w-4 h-4 text-[#B600A8]" /> Engineering Philosophy
+                  <BookOpen className="w-4 h-4 text-[#B600A8]" /> School Foundation & Teaching
                 </h4>
-                <p className="text-sm sm:text-base text-[#D7E2EA]/80 leading-relaxed italic border-l-2 border-[#B600A8] pl-4 py-1">
-                  &ldquo;I don&apos;t wait for graduation to start creating. Driven by building real hardware and AI products that solve tangible problems.&rdquo;
-                </p>
+                <div className="space-y-3">
+                  <div className="bg-white/5 p-3.5 rounded-2xl border border-white/5">
+                    <span className="font-bold text-white text-sm block">City Montessori School, Lucknow</span>
+                    <span className="text-xs text-[#D7E2EA]/70">Senior Secondary, Mathematics & Computer Science</span>
+                    <div className="flex gap-3 text-xs font-mono text-[#B600A8] font-bold mt-1">
+                      <span>Grade 10: 92%</span>
+                      <span>•</span>
+                      <span>Grade 12: 87%</span>
+                    </div>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-[#D7E2EA]/80 leading-relaxed italic border-l-2 border-[#B600A8] pl-3 py-1">
+                    &ldquo;Private CS Instructor & Mentor — Designed custom Java + OOP curriculum for 10+ high school students, achieving 100% student retention.&rdquo;
+                  </p>
+                </div>
               </div>
 
               <div>
-                <h4 className="text-xs uppercase font-bold tracking-widest text-[#D7E2EA]/50 mb-3">
-                  Key Milestones During Study
+                <h4 className="text-xs uppercase font-bold tracking-widest text-[#D7E2EA]/50 mb-3 flex items-center gap-2">
+                  <Award className="w-4 h-4 text-[#B600A8]" /> Core Academic Java Projects
                 </h4>
                 <ul className="space-y-2.5 text-xs sm:text-sm text-[#D7E2EA]/80">
                   <li className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#B600A8] mt-1.5 shrink-0" />
-                    <span><strong>EventFit AI:</strong> Designed and deployed catalog-based outfit recommender web app on Netlify.</span>
+                    <span><strong>ATM Simulator (Java, OOP):</strong> Transaction management system with class-based encapsulation & state management.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#B600A8] mt-1.5 shrink-0" />
-                    <span><strong>AtlasCV (Private Beta):</strong> Built Next.js + Gemini API generator for ATS resumes and LinkedIn optimization.</span>
+                    <span><strong>Student Management System (Java, CRUD):</strong> Object-oriented records system streamlining data retrieval.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#B600A8] mt-1.5 shrink-0" />
-                    <span><strong>ECHO-GATE Robotics:</strong> Served as Lead Engineer architecting centralized firmware & autonomous control loops (Completed).</span>
+                    <span><strong>Currency Converter (Java, REST API):</strong> Real-time exchange rate lookup engine.</span>
                   </li>
                 </ul>
               </div>

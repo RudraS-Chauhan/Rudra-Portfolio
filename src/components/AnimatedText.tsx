@@ -41,7 +41,7 @@ export const AnimatedText: React.FC<AnimatedTextProps> = ({
   return (
     <p
       ref={containerRef}
-      className={`text-[#D7E2EA] font-medium text-center leading-relaxed max-w-[560px] text-[clamp(1rem,2vw,1.35rem)] select-none ${className}`}
+      className={`relative text-[#D7E2EA] font-medium text-center leading-relaxed max-w-[560px] text-[clamp(1rem,2vw,1.35rem)] select-none ${className}`}
     >
       {words.map((word, wordIndex) => {
         const chars = word.split('');

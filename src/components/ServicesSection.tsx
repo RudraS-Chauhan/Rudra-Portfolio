@@ -1,5 +1,6 @@
 import React from 'react';
 import { FadeIn } from './FadeIn';
+import { SEO } from './SEO';
 
 interface ServiceItem {
   number: string;
@@ -18,7 +19,7 @@ const servicesData: ServiceItem[] = [
     number: '02',
     title: 'Robotics & System Architecture',
     description:
-      'Architected low-latency embedded systems, autonomous control modules, and centralized operations hardware as Lead Engineer at ECHO-GATE Robotics (Completed Operation).',
+      'Architected low-latency embedded systems, autonomous control modules, and centralized operations hardware as Lead Engineer at ECHO-GATE Robotics.',
   },
   {
     number: '03',
@@ -28,15 +29,9 @@ const servicesData: ServiceItem[] = [
   },
   {
     number: '04',
-    title: 'Web & AI Consulting',
+    title: 'High-Performance Web & API Architecture',
     description:
-      'Helping startups and founders build conversion-focused digital platforms with custom automated AI prompt chains and dark-mode spatial UI.',
-  },
-  {
-    number: '05',
-    title: '3D Systems & Product Ventures',
-    description:
-      'Creating scalable custom e-commerce engines and geometric product pipelines like Fold_Fantasia, handling 50+ unique mathematical origami designs.',
+      'Helping startups and founders build conversion-focused digital platforms with custom automated AI prompt chains, sub-second API speeds, and modern dark-mode spatial UI.',
   },
 ];
 
@@ -44,7 +39,7 @@ export const ServicesSection: React.FC = () => {
   return (
     <section
       id="services"
-      className="bg-white text-[#0C0C0C] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] px-5 sm:px-8 md:px-10 py-20 sm:py-24 md:py-32 w-full select-none relative z-10"
+      className="bg-white text-[#0C0C0C] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] px-5 sm:px-8 md:px-10 py-16 sm:py-24 md:py-32 w-full select-none relative z-10"
     >
       <div id="price" className="max-w-5xl mx-auto flex flex-col items-center">
         {/* Section Heading */}

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Bot, User, Sparkles, Loader2 } from 'lucide-react';
+import { SEO } from './SEO';
 
 interface Message {
   role: 'user' | 'assistant';

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, CheckCircle2, Sparkles } from 'lucide-react';
+import { SEO } from './SEO';
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -64,7 +65,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
                 </div>
                 <h3 className="text-2xl font-bold uppercase tracking-tight">Message Sent!</h3>
                 <p className="text-sm text-[#D7E2EA]/70 max-w-xs">
-                  Thanks for reaching out. Jack will review your project details and get back to you shortly.
+                  Thanks for reaching out. Rudra will review your project details and get back to you shortly.
                 </p>
               </motion.div>
             ) : (

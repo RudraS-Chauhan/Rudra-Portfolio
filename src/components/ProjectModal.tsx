@@ -1,14 +1,15 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, Box, Sparkles, Layers } from 'lucide-react';
+import { X, ExternalLink, Box, Sparkles, Layers, MessageSquareHeart } from 'lucide-react';
 import { ProjectData } from './ProjectsSection';
 
 interface ProjectModalProps {
   project: ProjectData | null;
   onClose: () => void;
+  onOpenFeedback?: (projectTitle: string) => void;
 }
 
-export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
+export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, onOpenFeedback }) => {
   if (!project) return null;
 
   return (
@@ -102,40 +103,55 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) 
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row items-center justify-end gap-4 pt-4">
-            <button
-              onClick={onClose}
-              className="w-full sm:w-auto px-6 py-3 rounded-full border border-white/20 text-sm font-medium uppercase tracking-wider hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              Close
-            </button>
-            {project.link ? (
-              <a
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto px-8 py-3 rounded-full font-medium uppercase tracking-widest text-white text-sm flex items-center justify-center gap-2 hover:scale-105 transition-all cursor-pointer"
-                style={{
-                  background: 'linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%)',
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/10">
+            {onOpenFeedback && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenFeedback(project.title);
                 }}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-[#B600A8]/40 bg-[#B600A8]/10 text-xs font-bold uppercase tracking-wider text-white hover:bg-[#B600A8]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
               >
-                <span>Launch App</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            ) : (
-              <a
-                href={project.col2Image}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto px-8 py-3 rounded-full font-medium uppercase tracking-widest text-white text-sm flex items-center justify-center gap-2 hover:scale-105 transition-all cursor-pointer"
-                style={{
-                  background: 'linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%)',
-                }}
-              >
-                <span>View Full Asset</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
+                <MessageSquareHeart className="w-4 h-4 text-[#B600A8]" />
+                <span>Rate / Leave Feedback</span>
+              </button>
             )}
+
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+              <button
+                onClick={onClose}
+                className="px-6 py-2.5 rounded-full border border-white/20 text-xs font-semibold uppercase tracking-wider hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+              {project.link ? (
+                <a
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-2.5 rounded-full font-bold uppercase tracking-widest text-white text-xs flex items-center justify-center gap-2 hover:scale-105 transition-all cursor-pointer"
+                  style={{
+                    background: 'linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%)',
+                  }}
+                >
+                  <span>Launch App</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              ) : (
+                <a
+                  href={project.col2Image}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-2.5 rounded-full font-bold uppercase tracking-widest text-white text-xs flex items-center justify-center gap-2 hover:scale-105 transition-all cursor-pointer"
+                  style={{
+                    background: 'linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%)',
+                  }}
+                >
+                  <span>View Asset</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
+            </div>
           </div>
         </motion.div>
       </div>
