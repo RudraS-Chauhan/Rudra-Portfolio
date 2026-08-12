@@ -82,7 +82,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick, onAiCl
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
-          className="hero-heading font-black uppercase tracking-tighter leading-none whitespace-nowrap w-full text-center text-[11.5vw] sm:text-[13vw] md:text-[14.5vw] lg:text-[15.5vw] xl:text-[16.5vw] mt-6 sm:mt-4 md:-mt-5 select-none"
+          className="hero-heading font-black uppercase tracking-tighter leading-none whitespace-nowrap w-full text-center text-[9.5vw] sm:text-[11vw] md:text-[12.5vw] lg:text-[13.5vw] xl:text-[14vw] mt-6 sm:mt-4 md:-mt-5 select-none"
         >
           Hi, i&apos;m rudra
         </motion.h1>
