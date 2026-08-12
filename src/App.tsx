@@ -5,6 +5,7 @@ import { ScrollProgressBar } from './components/ScrollProgressBar';
 import { InitialLoader } from './components/InitialLoader';
 import { AudioToggle } from './components/AudioToggle';
 import { ThemeToggle } from './components/ThemeToggle';
+import { ScrollToTop } from './components/ScrollToTop';
 import { CustomCursor } from './components/CustomCursor';
 import { SectionDock } from './components/SectionDock';
 import { ResumeModal } from './components/ResumeModal';
@@ -14,7 +15,7 @@ import { AboutSection } from './components/AboutSection';
 import { TechStackSection } from './components/TechStackSection';
 import { EducationSection } from './components/EducationSection';
 import { ServicesSection } from './components/ServicesSection';
-import { ProjectsSection, ProjectData } from './components/ProjectsSection';
+import { ProjectsSection, ProjectData, projectsData } from './components/ProjectsSection';
 import { FooterSection } from './components/FooterSection';
 import { ContactModal } from './components/ContactModal';
 import { ProjectModal } from './components/ProjectModal';
@@ -159,9 +160,10 @@ export function App() {
       {/* Interactive Custom Mouse Follower */}
       <CustomCursor />
 
-      {/* Floating Audio Mute/Unmute Toggle & Theme Preference Toggle */}
+      {/* Floating Audio, Theme Toggle & Scroll To Top FAB */}
       <AudioToggle />
       <ThemeToggle />
+      <ScrollToTop />
 
       {/* Section Dock for Side Dot Navigation */}
       <SectionDock />
@@ -279,7 +281,9 @@ export function App() {
       <ContactModal isOpen={isContactOpen} onClose={handleCloseContact} />
       <ProjectModal
         project={selectedProject}
+        projects={projectsData}
         onClose={handleCloseProject}
+        onSelectProject={setSelectedProject}
         onOpenFeedback={handleOpenFeedback}
       />
       <AiChatModal isOpen={isAiOpen} onClose={handleCloseAi} />

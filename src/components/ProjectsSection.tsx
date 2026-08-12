@@ -10,8 +10,8 @@ export interface ProjectData {
   number: string;
   category: string;
   title: string;
-  col1Image1: string;
-  col1Image2: string;
+  col1Image1?: string;
+  col1Image2?: string;
   col2Image: string;
   description?: string;
   link?: string;
@@ -326,7 +326,7 @@ export const caseStudyDetailsMap: Record<string, CaseStudyDetail> = {
   },
 };
 
-const projectsData: ProjectData[] = [
+export const projectsData: ProjectData[] = [
   {
     number: '01',
     category: 'Flagship AI Platform (Private Beta)',
@@ -357,7 +357,6 @@ const projectsData: ProjectData[] = [
     category: 'Robotics Core (Completed Operation)',
     title: 'ECHO-GATE Robotics',
     col1Image1: '/images/projects/echogate-feature1.png',
-    col1Image2: '/images/projects/echogate-feature2.png',
     col2Image: '/images/projects/echogate-main.png',
     description:
       'Centralized robotics architecture & automated operation platform. Successfully delivered firmware development, sensor integration, and autonomous control loops.',
@@ -495,45 +494,71 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           </div>
         </div>
 
-        {/* Bottom Row - Two Column Image Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 w-full">
-          {/* Left Column (40% width) */}
-          <div className="md:col-span-5 flex flex-col gap-4 sm:gap-6">
-            <div className="w-full rounded-[24px] sm:rounded-[36px] md:rounded-[44px] overflow-hidden border border-white/10 bg-[#121212]">
-              <img
-                src={project.col1Image1}
-                onError={(e) => handleImageError(e, fallbacks.feat1)}
-                alt={`${project.title} Feature 1`}
-                loading="lazy"
-                className="w-full object-cover transition-transform duration-500 hover:scale-105"
-                style={{ height: 'clamp(120px, 15vw, 210px)' }}
-              />
+        {/* Bottom Row - Image Grid (3-image or 2-image layout) */}
+        {project.col1Image2 ? (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 w-full">
+            {/* Left Column (40% width) */}
+            <div className="md:col-span-5 flex flex-col gap-4 sm:gap-6">
+              <div className="w-full rounded-[24px] sm:rounded-[36px] md:rounded-[44px] overflow-hidden border border-white/10 bg-[#121212]">
+                <img
+                  src={project.col1Image1}
+                  onError={(e) => handleImageError(e, fallbacks.feat1)}
+                  alt={`${project.title} Feature 1`}
+                  loading="lazy"
+                  className="w-full object-cover transition-transform duration-500 hover:scale-105"
+                  style={{ height: 'clamp(120px, 15vw, 210px)' }}
+                />
+              </div>
+              <div className="w-full rounded-[24px] sm:rounded-[36px] md:rounded-[44px] overflow-hidden border border-white/10 bg-[#121212]">
+                <img
+                  src={project.col1Image2}
+                  onError={(e) => handleImageError(e, fallbacks.feat2)}
+                  alt={`${project.title} Feature 2`}
+                  loading="lazy"
+                  className="w-full object-cover transition-transform duration-500 hover:scale-105"
+                  style={{ height: 'clamp(140px, 18vw, 260px)' }}
+                />
+              </div>
             </div>
-            <div className="w-full rounded-[24px] sm:rounded-[36px] md:rounded-[44px] overflow-hidden border border-white/10 bg-[#121212]">
-              <img
-                src={project.col1Image2}
-                onError={(e) => handleImageError(e, fallbacks.feat2)}
-                alt={`${project.title} Feature 2`}
-                loading="lazy"
-                className="w-full object-cover transition-transform duration-500 hover:scale-105"
-                style={{ height: 'clamp(140px, 18vw, 260px)' }}
-              />
+
+            {/* Right Column (60% width) */}
+            <div className="md:col-span-7 flex">
+              <div className="w-full h-full min-h-[240px] sm:min-h-[340px] rounded-[24px] sm:rounded-[36px] md:rounded-[44px] overflow-hidden border border-white/10 bg-[#121212]">
+                <img
+                  src={project.col2Image}
+                  onError={(e) => handleImageError(e, fallbacks.main)}
+                  alt={`${project.title} Main Preview`}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
             </div>
           </div>
-
-          {/* Right Column (60% width) */}
-          <div className="md:col-span-7 flex">
-            <div className="w-full h-full min-h-[240px] sm:min-h-[340px] rounded-[24px] sm:rounded-[36px] md:rounded-[44px] overflow-hidden border border-white/10 bg-[#121212]">
+        ) : (
+          /* Clean 2-image grid for hardware/firmware projects */
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full">
+            {project.col1Image1 && (
+              <div className="w-full rounded-[24px] sm:rounded-[36px] md:rounded-[44px] overflow-hidden border border-white/10 bg-[#121212] min-h-[220px] sm:min-h-[300px]">
+                <img
+                  src={project.col1Image1}
+                  onError={(e) => handleImageError(e, fallbacks.feat1)}
+                  alt={`${project.title} Hardware Module`}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+            )}
+            <div className="w-full rounded-[24px] sm:rounded-[36px] md:rounded-[44px] overflow-hidden border border-white/10 bg-[#121212] min-h-[220px] sm:min-h-[300px]">
               <img
                 src={project.col2Image}
                 onError={(e) => handleImageError(e, fallbacks.main)}
-                alt={`${project.title} Main Preview`}
+                alt={`${project.title} Main Operation`}
                 loading="lazy"
                 className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
               />
             </div>
           </div>
-        </div>
+        )}
 
         {/* Interactive Open-on-Scroll Case Study Deep-Dive */}
         {caseStudyData && isExpanded && (
